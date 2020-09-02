@@ -12,4 +12,3 @@ export default class LoginPage extends Component {
     }
 }
 
-// TEST TEST TEST
