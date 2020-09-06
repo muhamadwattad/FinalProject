@@ -1,14 +1,23 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, BackHandler, AsyncStorage } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+const Stack = createStackNavigator();
+import { Button, Icon } from 'native-base';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+import StackPage from './Pages/ScreensPages/StackPage';
+
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+
+      <StackPage />
+    )
+  }
 }
 
 const styles = StyleSheet.create({
