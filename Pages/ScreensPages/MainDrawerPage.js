@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-
+import { HEADERBUTTONCOLOR } from '../URL'
 import { DrawerContentScrollView, DrawerItemList, DrawerItem, createDrawerNavigator } from '@react-navigation/drawer';
 import { DrawerActions } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -43,9 +43,8 @@ export class Sidebar extends Component {
     this.progress = progress
     this.imgurl = "https://static.thenounproject.com/png/340719-200.png"
     this.state = {
-      curTime: new Date().toLocaleTimeString(),
       username: '',
-      fulllocation: 'Loading information',
+      email: '',
       switch: false,
       background: 'white',
       color: '#131313',
@@ -57,6 +56,9 @@ export class Sidebar extends Component {
   componentDidMount() {
     this.getData();
   }
+  logout = async () => {
+
+  }
 
   getData = async () => {
 
@@ -64,8 +66,18 @@ export class Sidebar extends Component {
     var user = await AsyncStorage.getItem("activeuser");
     var currentuser = JSON.parse(user);
 
-    //PUTS USERNAME INSIDE OF DRAWER
-    this.setState({ username: currentuser.name });
+    //PUTS USERNAME AND EMAIL INSIDE OF DRAWER
+    this.setState({ username: currentuser.name, email: currentuser.email });
+
+
+    //PUTS IMAGE URL
+
+    //TODO FIX THIS 
+    // var image = currentuser.image;
+    // if (!image.includes("https://platform-lookaside")) {
+    //   image = UrlOfFile + image;
+    // }
+
   }
 
   render() {
@@ -87,22 +99,26 @@ export class Sidebar extends Component {
             <Left style={{ backgroundColor: this.state.background, color: this.state.color }}>
               <Thumbnail source={{ uri: this.state.image }} style={{ borderBottomWidth: 1 }} ></Thumbnail>
             </Left>
-            <Body style={{ marginRight: 5 }}>
+            <Body style={{ marginRight: 15 }}>
               <H3 style={{ color: this.state.color }}>{this.state.username}</H3>
-              <Text note style={{ color: this.state.color }}>{this.state.fulllocation}</Text>
+              <Text note style={{ color: this.state.color }}>{this.state.email}</Text>
             </Body>
           </ListItem>
-
+          <DrawerContentScrollView {...this.props}   >
+            <Animated.View style={{ transform: [{}] }}>
+              <DrawerItemList {...this.props} inactiveTintColor={this.state.color} />
+            </Animated.View>
+          </DrawerContentScrollView>
 
         </Content>
         <Footer style={{ backgroundColor: this.state.background, borderStartWidth: 1 }} >
-          <Left>
+          <Right>
             <Button transparent style={{ backgroundColor: this.state.background }} onPress={async () => {
-              //TODO EXIT
+              this.logout();
             }}>
-              <MaterialCommunityIcons name="account-arrow-left" style={{ color: this.state.color, paddingLeft: 15 }} size={30}></MaterialCommunityIcons>
+              <MaterialCommunityIcons name="account-arrow-left" style={{ color: HEADERBUTTONCOLOR, paddingLeft: 15 }} size={30}></MaterialCommunityIcons>
             </Button>
-          </Left>
+          </Right>
 
         </Footer>
       </Container >

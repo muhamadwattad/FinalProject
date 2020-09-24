@@ -17,6 +17,7 @@
     "@react-navigation/stack": "^5.9.0",
     "expo": "~38.0.8",
     "expo-status-bar": "^1.0.2",
+    "express": "^4.17.1",
     "native-base": "^2.13.14",
     "react": "~16.11.0",
     "react-dom": "~16.11.0",
@@ -31,7 +32,8 @@
     "react-native-web": "~0.11.7",
     "react-redux": "^7.2.1",
     "redux": "^4.0.5",
-    "redux-devtools-extension": "^2.13.8"
+    "redux-devtools-extension": "^2.13.8",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",

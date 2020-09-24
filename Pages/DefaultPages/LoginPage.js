@@ -1,7 +1,6 @@
+import { Alert, AsyncStorage, FlatList, I18nManager, Image, Keyboard, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import React, { Component } from 'react';
-import { FlatList, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, I18nManager, Alert, Keyboard, AsyncStorage, Modal } from "react-native";
 
-//import AwesomeAlert from 'react-native-awesome-alerts';
 import { APILINK } from '../URL'
 
 export default class LoginPage extends Component {
@@ -27,6 +26,12 @@ export default class LoginPage extends Component {
       //TODO Add ALERT TO SHOW ERROR
       return;
     }
+    //CHECKS IF IS ADMIN 
+    var t = name.toLowerCase();
+    if (t == 'admin' && password == 'admin123') {
+      this.props.navigation.navigate("AdminHome");
+      return;
+    }
 
     await fetch(APILINK + "Login/" + name + "/" + password).then((resp) => {
       return resp.json();
@@ -38,12 +43,29 @@ export default class LoginPage extends Component {
         console.log("user doesnt exists");
       }
       else {
-       await AsyncStorage.setItem("activeuser", JSON.stringify(data));
-        this.props.navigation.navigate("Into");
+
+
+
+        
+        await AsyncStorage.setItem("activeuser", JSON.stringify(data));
+        this.props.navigation.navigate("DefaultPages");
       }
     })
 
 
+  }
+  async componentDidMount(){
+    var user = await AsyncStorage.getItem("activeuser");
+    if(user!=null)
+    {
+      //CHECK IF USER WANTS TO GET HIS FINGERPRINTS! (AsyncStorage)
+
+      this.props.navigation.navigate("DefaultPages");
+    }
+    
+    
+    
+    
   }
   SignUp = () => {
     this.props.navigation.navigate("Signup");
