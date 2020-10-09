@@ -385,7 +385,7 @@ export default class HomePage extends Component {
 
 
 
-          {this.state.games == "No Games Found" ? <Text>NULL</Text> :
+          {this.state.games == "No Games Found"||this.state.games.length==0 ? <Text>NULL</Text> :
             <List scrollEnabled={true} onScroll={(e) => {
 
             }}>
@@ -398,23 +398,25 @@ export default class HomePage extends Component {
 
                   var homeTeam = this.state.teams.find(team => team.team_id == game.homeTeamCode);
                   var awayTeam = this.state.teams.find(team => team.team_id == game.awayTeamCode);
-                  var matchdate=game.event_date.split(" ")[1];
-                  
+                  var matchdate = game.event_date.split(" ")[1];
+                  console.log(game)
+
                   return (
                     <ListItem key={index.toString()}>
-                      
+
                       {/*HOME TEAM*/}
-                      <View style={{}}>
-                      <View>
-                        <Thumbnail source={{ uri: homeTeam.logo }} />
-                      </View>
-                      <View style={{ alignSelf: 'flex-end',borderColor: 'black', borderBottomWidth: 1, borderTopWidth: 1, borderRightWidth: 1, borderLeftWidth: 1,width:windowWidth/3}}>
-                        <Text style={{textAlign:'center'}}> {matchdate}</Text>
-                      </View>
-                      {/*AWAY TEAM*/}
-                      <View style={{alignSelf: 'flex-start'}}>
-                        <Thumbnail source={{ uri: awayTeam.logo }} />
-                      </View>
+                      <View style={{ justifyContent:'space-between',flexDirection: 'row',width:'100%',display: 'flex', }}>
+                        <View style={{alignItems:'flex-start'}}>
+                          <Thumbnail source={{ uri: homeTeam.logo }} />
+                        </View>
+                        <View style={{ borderColor: 'black',  }}>
+                          <Text style={{ textAlign: 'center' }}> {matchdate}</Text>
+                          <Text2 note> TEST TEST</Text2>
+                        </View>
+                        {/*AWAY TEAM*/}
+                        <View style={{alignItems:'flex-end'}}>
+                          <Thumbnail source={{ uri: awayTeam.logo }} />
+                        </View>
                       </View>
                     </ListItem>
                   )
