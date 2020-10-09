@@ -33,7 +33,7 @@ export default class App extends React.Component {
     //getting teams and saving them into the AsyncStorage
 
     var teams = await AsyncStorage.getItem("teams");
-    if (teams == null) {
+    while (teams == null) {
 
       var url = APILINK + "getteams/"
       console.log(url);
@@ -43,6 +43,7 @@ export default class App extends React.Component {
 
         await AsyncStorage.setItem("teams", JSON.stringify(data));
       })
+      teams = await AsyncStorage.getItem("teams");
     }
   }
   _handleAppStateChange = async (nextAppState) => {
