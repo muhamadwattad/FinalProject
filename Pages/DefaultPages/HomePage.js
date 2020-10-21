@@ -5,6 +5,7 @@ import { Cell, Col, Cols, Row, Rows, Table, TableWrapper } from 'react-native-ta
 import React, { Component } from 'react'
 
 import { APILINK } from '../URL'
+import AwesomeAlert from 'react-native-awesome-alerts';
 import { Dimensions } from 'react-native';
 import { HEADERBUTTONCOLOR } from '../URL';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -41,173 +42,11 @@ export default class HomePage extends Component {
       FavoriteOnOff: 'black',
       showCalendar: false,
       teams: [],
+      showError: false
 
     }
 
   }
-  async componentDidMount() {
-    //getting teams
-    var teams = await JSON.parse(await AsyncStorage.getItem("teams"));
-    this.setState({ teams }, () => {
-
-    });
-
-    //updating user's status TO ACTIVE
-
-    var user = await AsyncStorage.getItem("activeuser");
-    var currentuser = JSON.parse(user);
-    var url = APILINK + "updateStatus/" + currentuser.email + "/true/"
-    await fetch(url);
-
-    if (this.state.games == "No Games Found") {
-
-    }
-    else {
-
-    }
-
-
-  }
-
-  getDates = async () => {
-    //GETTING THE DAYS OF THE REST OF THE WEEK
-    var dateObj = new Date()
-
-    var monthAbbrvName = dateObj.toDateString().substring(4, 7);
-
-
-
-    var weekdayNumber = dateObj.getDay()
-
-    var tmr;
-    var in2days;
-
-    if (weekdayNumber == 6)
-      tmr = 0;
-    else tmr = weekdayNumber + 1;
-    if (tmr == 6)
-      in2days = 0;
-    else
-      in2days = tmr + 1;
-
-
-    var yestrday;
-    var _2daysago;
-    if (weekdayNumber == 0)
-      yestrday = 6
-    else yestrday = weekdayNumber - 1;
-    if (yestrday == 0)
-      _2daysago = 6;
-    else
-      _2daysago = yestrday - 1;
-
-
-    this.setState({ today: weekdayNumber });
-    this.setState({ _2daysago, yestrday, tmr, in2days });
-
-
-
-    //GETTING DATES OF IN TODAY AND TOMRROW AND 2 DAYS FROM TODAY AND YESTRDAY AND 2 DAYS AGO 
-
-    var yestrdaydate = new Date(dateObj);
-    yestrdaydate.setDate(yestrdaydate.getDate() - 1);
-
-    var _2daysagodate = new Date(yestrdaydate);
-    _2daysagodate.setDate(_2daysagodate.getDate() - 1);
-
-    var tomorrowdate = new Date(dateObj);
-    tomorrowdate.setDate(tomorrowdate.getDate() + 1);
-
-    var _in2daysdate = new Date(tomorrowdate);
-    _in2daysdate.setDate(_in2daysdate.getDate() + 1);
-
-    var todaystring = dateObj.getDate() + "/" + moment().format("MM");
-    var yestrdaystring = yestrdaydate.getDate() + "/" + moment(yestrdaydate).format("MM");
-    var _2daysagostring = _2daysagodate.getDate() + "/" + moment(_2daysagodate).format("MM");
-    var tomorrowstring = tomorrowdate.getDate() + "/" + moment(tomorrowdate).format("MM");
-    var _in2daysstring = _in2daysdate.getDate() + "/" + moment(_in2daysdate).format("MM");
-    this.setState({ selecteddate: 'SelectedDate\n' + todaystring })
-
-
-
-
-    this.setState({ todaystring, yestrdaystring, _2daysagostring, tomorrowstring, _in2daysstring });
-    //DATE OF GAMEDAY (TODAY)
-    var MonthString = "" + moment().format("MM");
-    if (MonthString.length == 1)
-      MonthString = "0" + MonthString;
-    var DayString = "" + dateObj.getDate();
-    if (DayString.length == 1)
-      DayString = "0" + DayString;
-
-    var GameDayDate = MonthString + "-" + DayString
-
-    this.setState({ GameDayDate });
-
-  }
-  getGames = async () => {
-    //GETTING GAMES AND SAVING THEM INTO THE ASYNC STORAGE
-
-    var url = APILINK + "getgamesbydate/10-05";
-
-    await fetch(url).then((resp) => {
-      return resp.json();
-    }).then(async (data) => {
-      //CHECKING IF GAMES HAS BEEN ADDED SUCCESFULLY
-      if (data.Message.includes("No Games Found")) {
-        //SHOWING ERROR MESSAGE
-        this.setState({ games: "No Games Found" });
-
-
-      }
-      else {
-        //SAVING GAMES INTO ARRAY IN THE STATE AND IN ASYNC STORAGE 
-        this.setState({ games: data });
-
-
-
-      }
-    });
-  }
-
-  async UNSAFE_componentWillMount() {
-    this.getDates();
-
-    this.getGames();
-  }
-
-
-  SaveGames = async (date) => {
-    //TURNING DATE TO C# DATE TO GET DATA FROM API
-
-    var NewDate = TurnDate(date);
-    var url = APILINK + "getgamesbydate/" + NewDate;
-
-
-    await fetch(url).then((resp) => {
-      return resp.json();
-    }).then(async (data) => {
-      //CHECKING IF GAMES HAS BEEN ADDED SUCCESFULLY
-      if ('Message' in data) {
-
-        this.setState({ games: "No Games Found" }, () => {
-          if (this.state.showCalendar == true)
-            this.setState({ showCalendar: false })
-        });
-      }
-      else {
-        //SAVING GAMES INTO ARRAY IN THE STATE AND IN ASYNC STORAGE 
-        this.setState({ games: data }, () => {
-          this.setState({ showCalendar: false });
-        });
-
-      }
-    });
-
-
-  }
-
-
   render() {
     return (
       <Container >
@@ -230,6 +69,7 @@ export default class HomePage extends Component {
 
 
         </Header>
+       
         <Modal
           transparent={true}
 
@@ -384,8 +224,27 @@ export default class HomePage extends Component {
         <Content scrollEnabled={true}>
 
 
+          <AwesomeAlert
+            show={this.state.showError}
+            showProgress={false}
+            title="אין משחקים"
+            message="לא נמצאו משחקים בתאריך זה"
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            cancelText="No, cancel"
+            confirmText="לְהַמשִׁיך"
+            confirmButtonColor="#DD6B55"
+            onCancelPressed={() => {
+              this.setState({ showError: false })
+            }}
+            onConfirmPressed={() => {
+              this.setState({ showError: false })
+            }}
+          />
 
-          {this.state.games == "No Games Found"||this.state.games.length==0 ? <Text>NULL</Text> :
+          {this.state.games == "No Games Found" || this.state.games.length == 0 ? <Text>NULL</Text> :
             <List scrollEnabled={true} onScroll={(e) => {
 
             }}>
@@ -399,22 +258,22 @@ export default class HomePage extends Component {
                   var homeTeam = this.state.teams.find(team => team.team_id == game.homeTeamCode);
                   var awayTeam = this.state.teams.find(team => team.team_id == game.awayTeamCode);
                   var matchdate = game.event_date.split(" ")[1];
-                  console.log(game)
+                  
 
                   return (
                     <ListItem key={index.toString()}>
 
                       {/*HOME TEAM*/}
-                      <View style={{ justifyContent:'space-between',flexDirection: 'row',width:'100%',display: 'flex', }}>
-                        <View style={{alignItems:'flex-start'}}>
+                      <View style={{ justifyContent: 'space-between', flexDirection: 'row', width: '100%', display: 'flex', }}>
+                        <View style={{ alignItems: 'flex-start' }}>
                           <Thumbnail source={{ uri: homeTeam.logo }} />
                         </View>
-                        <View style={{ borderColor: 'black',  }}>
+                        <View style={{ borderColor: 'black', }}>
                           <Text style={{ textAlign: 'center' }}> {matchdate}</Text>
                           <Text2 note> TEST TEST</Text2>
                         </View>
                         {/*AWAY TEAM*/}
-                        <View style={{alignItems:'flex-end'}}>
+                        <View style={{ alignItems: 'flex-end' }}>
                           <Thumbnail source={{ uri: awayTeam.logo }} />
                         </View>
                       </View>
@@ -430,6 +289,174 @@ export default class HomePage extends Component {
       </Container>
     )
   }
+
+  async componentDidMount() {
+    //getting teams
+    var teams = await JSON.parse(await AsyncStorage.getItem("teams"));
+    this.setState({ teams }, () => {
+
+    });
+
+    //updating user's status TO ACTIVE
+
+    var user = await AsyncStorage.getItem("activeuser");
+    var currentuser = JSON.parse(user);
+    var url = APILINK + "updateStatus/" + currentuser.email + "/true/"
+    await fetch(url);
+
+    if (this.state.games == "No Games Found") {
+
+    }
+    else {
+
+    }
+
+
+  }
+
+  getDates = async () => {
+    //GETTING THE DAYS OF THE REST OF THE WEEK
+    var dateObj = new Date()
+
+    var monthAbbrvName = dateObj.toDateString().substring(4, 7);
+
+
+
+    var weekdayNumber = dateObj.getDay()
+
+    var tmr;
+    var in2days;
+
+    if (weekdayNumber == 6)
+      tmr = 0;
+    else tmr = weekdayNumber + 1;
+    if (tmr == 6)
+      in2days = 0;
+    else
+      in2days = tmr + 1;
+
+
+    var yestrday;
+    var _2daysago;
+    if (weekdayNumber == 0)
+      yestrday = 6
+    else yestrday = weekdayNumber - 1;
+    if (yestrday == 0)
+      _2daysago = 6;
+    else
+      _2daysago = yestrday - 1;
+
+
+    this.setState({ today: weekdayNumber });
+    this.setState({ _2daysago, yestrday, tmr, in2days });
+
+
+
+    //GETTING DATES OF IN TODAY AND TOMRROW AND 2 DAYS FROM TODAY AND YESTRDAY AND 2 DAYS AGO 
+
+    var yestrdaydate = new Date(dateObj);
+    yestrdaydate.setDate(yestrdaydate.getDate() - 1);
+
+    var _2daysagodate = new Date(yestrdaydate);
+    _2daysagodate.setDate(_2daysagodate.getDate() - 1);
+
+    var tomorrowdate = new Date(dateObj);
+    tomorrowdate.setDate(tomorrowdate.getDate() + 1);
+
+    var _in2daysdate = new Date(tomorrowdate);
+    _in2daysdate.setDate(_in2daysdate.getDate() + 1);
+
+    var todaystring = dateObj.getDate() + "/" + moment().format("MM");
+    var yestrdaystring = yestrdaydate.getDate() + "/" + moment(yestrdaydate).format("MM");
+    var _2daysagostring = _2daysagodate.getDate() + "/" + moment(_2daysagodate).format("MM");
+    var tomorrowstring = tomorrowdate.getDate() + "/" + moment(tomorrowdate).format("MM");
+    var _in2daysstring = _in2daysdate.getDate() + "/" + moment(_in2daysdate).format("MM");
+    this.setState({ selecteddate: 'SelectedDate\n' + todaystring })
+
+
+
+
+    this.setState({ todaystring, yestrdaystring, _2daysagostring, tomorrowstring, _in2daysstring });
+    //DATE OF GAMEDAY (TODAY)
+    var MonthString = "" + moment().format("MM");
+    if (MonthString.length == 1)
+      MonthString = "0" + MonthString;
+    var DayString = "" + dateObj.getDate();
+    if (DayString.length == 1)
+      DayString = "0" + DayString;
+
+    var GameDayDate = MonthString + "-" + DayString
+
+    this.setState({ GameDayDate });
+
+  }
+  getGames = async () => {
+    //GETTING TODAY's GAMES AND SAVING THEM INTO THE ASYNC STORAGE
+
+    var TodayDate = TurnDate(this.state.todaystring);
+    var url = APILINK + "getgamesbydate/" + TodayDate + "/";
+    
+    
+
+    await fetch(url).then((resp) => {
+      return resp.json();
+    }).then(async (data) => {
+      //CHECKING IF GAMES HAS BEEN ADDED SUCCESFULLY
+      if (data.Message.includes("No Games Found")) {
+        //SHOWING ERROR MESSAGE
+        this.setState({ games: "No Games Found" });
+        this.setState({ showError: true });
+
+      }
+      else {
+        //SAVING GAMES INTO ARRAY IN THE STATE AND IN ASYNC STORAGE 
+        this.setState({ games: data });
+
+
+
+      }
+    });
+  }
+
+  async UNSAFE_componentWillMount() {
+    await this.getDates();
+
+    await this.getGames();
+  }
+
+
+  SaveGames = async (date) => {
+    //TURNING DATE TO C# DATE TO GET DATA FROM API
+
+    var NewDate = TurnDate(date);
+    var url = APILINK + "getgamesbydate/" + NewDate;
+    console.log(url);
+    await fetch(url).then((resp) => {
+      return resp.json();
+    }).then(async (data) => {
+      //CHECKING IF GAMES HAS BEEN ADDED SUCCESFULLY
+      if ('Message' in data) {
+        this.setState({ games: "No Games Found" }, () => {
+          if (this.state.showCalendar == true)
+            this.setState({ showCalendar: false })
+          this.setState({ showError: true });
+
+        });
+      }
+      else {
+        //SAVING GAMES INTO ARRAY IN THE STATE AND IN ASYNC STORAGE 
+        this.setState({ games: data }, () => {
+          this.setState({ showCalendar: false });
+        });
+
+      }
+    });
+
+
+  }
+
+
+
 } const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff' },
   head: { height: 40, backgroundColor: '#f1f8ff', fontFamily: 'monospace' },

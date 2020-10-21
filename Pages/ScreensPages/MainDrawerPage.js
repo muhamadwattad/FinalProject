@@ -1,13 +1,16 @@
+import { Body, Button, Container, Content, Footer, H3, Header, Icon, Left, List, ListItem, Right, Switch, Text, Thumbnail } from 'native-base'
+import { DrawerContentScrollView, DrawerItem, DrawerItemList, createDrawerNavigator } from '@react-navigation/drawer';
 import React, { Component } from 'react'
-import { HEADERBUTTONCOLOR } from '../URL'
-import { DrawerContentScrollView, DrawerItemList, DrawerItem, createDrawerNavigator } from '@react-navigation/drawer';
-import { DrawerActions } from '@react-navigation/native';
-import { NavigationContainer } from '@react-navigation/native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import HomePage from '../DefaultPages/HomePage';
+
 import Animated from 'react-native-reanimated'
-import { Icon, Container, Header, Content, Footer, Button, Right, ListItem, Left, Thumbnail, List, Body, H3, Text, Switch } from 'native-base'
 import { AsyncStorage } from 'react-native';
+import { DrawerActions } from '@react-navigation/native';
+import { HEADERBUTTONCOLOR } from '../URL'
+import HomePage from '../DefaultPages/HomePage';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { NavigationContainer } from '@react-navigation/native';
+import TwoTeamsGame from '../DefaultPages/TwoTeamsGame';
+
 const Drawer = createDrawerNavigator();
 export default class MainDrawerPage extends Component {
   render() {
@@ -24,6 +27,16 @@ export default class MainDrawerPage extends Component {
             drawerIcon: ({ focused, color, size }) => (
               <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
             ), title: 'בית'
+          }}
+        />
+        <Drawer.Screen name="TwoTeams"
+          title="משחק בין שתי קבוצות"
+          component={TwoTeamsGame}
+          options={{
+            drawerIcon: ({ focused, color, size }) => (
+              <Icon name="team" type="AntDesign" style={{fontSize:size,color:color}} />
+              // <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
+            ), title: 'משחק בין שתי קבוצות'
           }}
         />
 
