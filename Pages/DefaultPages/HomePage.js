@@ -402,7 +402,7 @@ export default class HomePage extends Component {
       return resp.json();
     }).then(async (data) => {
       //CHECKING IF GAMES HAS BEEN ADDED SUCCESFULLY
-      if (data.Message.includes("No Games Found")) {
+      if ('Message' in data) {
         //SHOWING ERROR MESSAGE
         this.setState({ games: "No Games Found" });
         this.setState({ showError: true });

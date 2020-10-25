@@ -51,14 +51,17 @@ export default class App extends React.Component {
       console.log('the app is closed');
     }
     if (nextAppState == 'background') {
+      
       var user = await AsyncStorage.getItem("activeuser");
       if (user != null) {
         var currentuser = JSON.parse(user);
         var url = APILINK + "updateStatus/" + currentuser.email + "/false/"
+        
         await fetch(url);
       }
     }
     if (nextAppState == 'active') {
+      
       var user = await AsyncStorage.getItem("activeuser");
       if (user != null) {
         var currentuser = JSON.parse(user);

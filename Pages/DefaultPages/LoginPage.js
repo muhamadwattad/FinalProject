@@ -26,19 +26,13 @@ export default class LoginPage extends Component {
       //TODO Add ALERT TO SHOW ERROR
       return;
     }
-    //CHECKS IF IS ADMIN 
-    var t = name.toLowerCase();
-    if (t == 'admin' && password == 'admin123') {
-      this.props.navigation.navigate("AdminHome");
-      return;
-    }
 
     await fetch(APILINK + "Login/" + name + "/" + password).then((resp) => {
       return resp.json();
     }).then(async (data) => {
       console.log(data);
       //IF API RETURNS MESSAGE IT MEANS THAT INFORMATION ARE WRONG
-      if (data.Message == "Failed to login") {
+      if ('Message' in data) {
         //TODO Add ALERT TO SHOW ERROR
         console.log("user doesnt exists");
       }
@@ -58,7 +52,7 @@ export default class LoginPage extends Component {
     var user = await AsyncStorage.getItem("activeuser");
     if(user!=null)
     {
-      //CHECK IF USER WANTS TO GET HIS FINGERPRINTS! (AsyncStorage)
+      //TODO CHECK IF USER WANTS TO GET HIS FINGERPRINTS! (AsyncStorage)
 
       this.props.navigation.navigate("DefaultPages");
     }

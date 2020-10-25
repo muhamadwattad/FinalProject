@@ -34,7 +34,7 @@ export default class MainDrawerPage extends Component {
           component={TwoTeamsGame}
           options={{
             drawerIcon: ({ focused, color, size }) => (
-              <Icon name="team" type="AntDesign" style={{fontSize:size,color:color}} />
+              <Icon name="team" type="AntDesign" style={{ fontSize: size, color: color }} />
               // <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
             ), title: 'משחק בין שתי קבוצות'
           }}
@@ -70,7 +70,8 @@ export class Sidebar extends Component {
     this.getData();
   }
   logout = async () => {
-
+    var activeuser = await AsyncStorage.getItem("activeuser");
+    console.log(activeuser);
   }
 
   getData = async () => {
