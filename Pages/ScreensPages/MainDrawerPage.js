@@ -9,6 +9,7 @@ import { HEADERBUTTONCOLOR } from '../URL'
 import HomePage from '../DefaultPages/HomePage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { NavigationContainer } from '@react-navigation/native';
+import StadiumSearch from '../DefaultPages/StadiumSearch'
 import TwoTeamsGame from '../DefaultPages/TwoTeamsGame';
 
 const Drawer = createDrawerNavigator();
@@ -37,6 +38,16 @@ export default class MainDrawerPage extends Component {
               <Icon name="team" type="AntDesign" style={{ fontSize: size, color: color }} />
               // <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
             ), title: 'משחק בין שתי קבוצות'
+          }}
+        />
+        <Drawer.Screen name="StadiumSearch"
+          title="חיפוש אצטדיון"
+          component={StadiumSearch}
+          options={{
+            drawerIcon: ({ focused, color, size }) => (
+              <Icon name="stadium-variant" type="MaterialCommunityIcons" style={{ fontSize: size, color: color }} />
+              // <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
+            ), title: "חיפוש אצטדיון"
           }}
         />
 
@@ -103,7 +114,7 @@ export class Sidebar extends Component {
             <Button transparent style={{ backgroundColor: this.state.background }} onPress={() => {
               this.props.navigation.dispatch(DrawerActions.closeDrawer())
             }}>
-              <Icon name="menu" style={{ color: 'blue', }} onPress={() => {
+              <Icon name="menu" style={{ color: '#228B22', }} onPress={() => {
               }} />
             </Button>
           </Right>
