@@ -1,80 +1,132 @@
-import { Body, Button, Container, Content, Footer, H3, Header, Icon, Left, List, ListItem, Right, Switch, Text, Thumbnail } from 'native-base'
-import { DrawerContentScrollView, DrawerItem, DrawerItemList, createDrawerNavigator } from '@react-navigation/drawer';
-import React, { Component } from 'react'
+import {
+  Body,
+  Button,
+  Container,
+  Content,
+  Footer,
+  H3,
+  Header,
+  Icon,
+  Left,
+  List,
+  ListItem,
+  Right,
+  Switch,
+  Text,
+  Thumbnail,
+} from "native-base";
+import {
+  DrawerContentScrollView,
+  DrawerItem,
+  DrawerItemList,
+  createDrawerNavigator,
+} from "@react-navigation/drawer";
+import React, { Component } from "react";
 
-import Animated from 'react-native-reanimated'
-import { AsyncStorage } from 'react-native';
-import { DrawerActions } from '@react-navigation/native';
-import { HEADERBUTTONCOLOR } from '../URL'
-import HomePage from '../DefaultPages/HomePage';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { NavigationContainer } from '@react-navigation/native';
-import StadiumSearch from '../DefaultPages/StadiumSearch'
-import TwoTeamsGame from '../DefaultPages/TwoTeamsGame';
+import Animated from "react-native-reanimated";
+import { AsyncStorage } from "react-native";
+import { DrawerActions } from "@react-navigation/native";
+import { HEADERBUTTONCOLOR } from "../URL";
+import HomePage from "../DefaultPages/HomePage";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { NavigationContainer } from "@react-navigation/native";
+import StadiumSearch from "../DefaultPages/StadiumSearch";
+import TwoTeamsGame from "../DefaultPages/TwoTeamsGame";
+import MoreStadium from "../DefaultPages/MoreStadium";
 
 const Drawer = createDrawerNavigator();
 export default class MainDrawerPage extends Component {
   render() {
     return (
-      <Drawer.Navigator drawerPosition="right" drawerType="slide" drawerContentOptions={{
-        activeBackgroundColor: '#cdf8cd'
-      }}
+      <Drawer.Navigator
+        drawerPosition="right"
+        drawerType="slide"
+        drawerContentOptions={{
+          activeBackgroundColor: "#cdf8cd",
+        }}
         drawerContent={(props) => <Sidebar {...props} />}
       >
-        <Drawer.Screen name="Home"
+        <Drawer.Screen
+          name="Home"
           title="בית"
           component={HomePage}
           options={{
             drawerIcon: ({ focused, color, size }) => (
-              <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
-            ), title: 'בית'
+              <MaterialCommunityIcons
+                name="home"
+                style={{ fontSize: size, color: color }}
+              />
+            ),
+            title: "בית",
           }}
         />
-        <Drawer.Screen name="TwoTeams"
+        <Drawer.Screen
+          name="TwoTeams"
           title="משחק בין שתי קבוצות"
           component={TwoTeamsGame}
           options={{
             drawerIcon: ({ focused, color, size }) => (
-              <Icon name="team" type="AntDesign" style={{ fontSize: size, color: color }} />
+              <Icon
+                name="team"
+                type="AntDesign"
+                style={{ fontSize: size, color: color }}
+              />
               // <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
-            ), title: 'משחק בין שתי קבוצות'
+            ),
+            title: "משחק בין שתי קבוצות",
           }}
         />
-        <Drawer.Screen name="StadiumSearch"
+        <Drawer.Screen
+          name="StadiumSearch"
           title="חיפוש אצטדיון"
           component={StadiumSearch}
           options={{
             drawerIcon: ({ focused, color, size }) => (
-              <Icon name="stadium-variant" type="MaterialCommunityIcons" style={{ fontSize: size, color: color }} />
+              <Icon
+                name="stadium-variant"
+                type="MaterialCommunityIcons"
+                style={{ fontSize: size, color: color }}
+              />
               // <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
-            ), title: "חיפוש אצטדיון"
+            ),
+            title: "חיפוש אצטדיון",
           }}
         />
 
-        {/* <Drawer.Screen />
-        <Drawer.Screen /> */}
+        <Drawer.Screen
+          name="MoreStadium"
+          title="אצטדיון פלוס"
+          component={MoreStadium}
+          options={{
+            drawerIcon: ({ focused, color, size }) => (
+              <Icon
+                name="soccer-field"
+                type="MaterialCommunityIcons"
+                style={{ fontSize: size, color: color }}
+              />
+              // <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
+            ),
+            title: "אצטדיון פלוס",
+          }}
+        />
       </Drawer.Navigator>
-    )
+    );
   }
 }
 
-
-
 export class Sidebar extends Component {
-
   constructor(progress, ...props) {
     super(...props);
-    this.progress = progress
-    this.imgurl = "https://static.thenounproject.com/png/340719-200.png"
+    this.progress = progress;
+    this.imgurl = "https://static.thenounproject.com/png/340719-200.png";
     this.state = {
-      username: '',
-      email: '',
+      username: "",
+      email: "",
       switch: false,
-      background: 'white',
-      color: '#131313',
-      image: "https://static.thenounproject.com/png/340719-200.png"
-    }
-
+      background: "white",
+      color: "#131313",
+      image: "https://static.thenounproject.com/png/340719-200.png",
+    };
   }
 
   componentDidMount() {
@@ -83,10 +135,9 @@ export class Sidebar extends Component {
   logout = async () => {
     var activeuser = await AsyncStorage.getItem("activeuser");
     console.log(activeuser);
-  }
+  };
 
   getData = async () => {
-
     //GETS CURRENT USER
     var user = await AsyncStorage.getItem("activeuser");
     var currentuser = JSON.parse(user);
@@ -94,59 +145,100 @@ export class Sidebar extends Component {
     //PUTS USERNAME AND EMAIL INSIDE OF DRAWER
     this.setState({ username: currentuser.name, email: currentuser.email });
 
-
     //PUTS IMAGE URL
 
-    //TODO FIX THIS 
+    //TODO FIX THIS
     // var image = currentuser.image;
     // if (!image.includes("https://platform-lookaside")) {
     //   image = UrlOfFile + image;
     // }
-
-  }
+  };
 
   render() {
     return (
-      < Container style={{ backgroundColor: this.state.background, color: this.state.color }}>
-        <Header style={{ backgroundColor: this.state.background, shadowOffset: { height: 1 } }}>
-
+      <Container
+        style={{
+          backgroundColor: this.state.background,
+          color: this.state.color,
+        }}
+      >
+        <Header
+          style={{
+            backgroundColor: this.state.background,
+            shadowOffset: { height: 1 },
+          }}
+        >
           <Right>
-            <Button transparent style={{ backgroundColor: this.state.background }} onPress={() => {
-              this.props.navigation.dispatch(DrawerActions.closeDrawer())
-            }}>
-              <Icon name="menu" style={{ color: '#228B22', }} onPress={() => {
-              }} />
+            <Button
+              transparent
+              style={{ backgroundColor: this.state.background }}
+              onPress={() => {
+                this.props.navigation.dispatch(DrawerActions.closeDrawer());
+              }}
+            >
+              <Icon
+                name="menu"
+                style={{ color: "#228B22" }}
+                onPress={() => {}}
+              />
             </Button>
           </Right>
         </Header>
-        <Content >
-          <ListItem thumbnail style={{ backgroundColor: this.state.background }}>
-            <Left style={{ backgroundColor: this.state.background, color: this.state.color }}>
-              <Thumbnail source={{ uri: this.state.image }} style={{ borderBottomWidth: 1 }} ></Thumbnail>
+        <Content>
+          <ListItem
+            thumbnail
+            style={{ backgroundColor: this.state.background }}
+          >
+            <Left
+              style={{
+                backgroundColor: this.state.background,
+                color: this.state.color,
+              }}
+            >
+              <Thumbnail
+                source={{ uri: this.state.image }}
+                style={{ borderBottomWidth: 1 }}
+              ></Thumbnail>
             </Left>
             <Body style={{ marginRight: 15 }}>
               <H3 style={{ color: this.state.color }}>{this.state.username}</H3>
-              <Text note style={{ color: this.state.color }}>{this.state.email}</Text>
+              <Text note style={{ color: this.state.color }}>
+                {this.state.email}
+              </Text>
             </Body>
           </ListItem>
-          <DrawerContentScrollView {...this.props}   >
+          <DrawerContentScrollView {...this.props}>
             <Animated.View style={{ transform: [{}] }}>
-              <DrawerItemList {...this.props} inactiveTintColor={this.state.color} />
+              <DrawerItemList
+                {...this.props}
+                inactiveTintColor={this.state.color}
+              />
             </Animated.View>
           </DrawerContentScrollView>
-
         </Content>
-        <Footer style={{ backgroundColor: this.state.background, borderStartWidth: 1 }} >
+        <Footer
+          style={{
+            backgroundColor: this.state.background,
+            borderStartWidth: 1,
+          }}
+        >
           <Right>
-            <Button transparent style={{ backgroundColor: this.state.background }} onPress={async () => {
-              this.logout();
-            }}>
-              <MaterialCommunityIcons name="account-arrow-left" style={{ color: HEADERBUTTONCOLOR, paddingLeft: 15 }} size={30}></MaterialCommunityIcons>
+            <Button
+              transparent
+              style={{ backgroundColor: this.state.background }}
+              onPress={async () => {
+                this.logout();
+              }}
+            >
+              <MaterialCommunityIcons
+                name="account-arrow-left"
+                style={{ color: HEADERBUTTONCOLOR, paddingLeft: 15 }}
+                size={30}
+              ></MaterialCommunityIcons>
             </Button>
           </Right>
-
         </Footer>
-      </Container >
-    )
+      </Container>
+    );
   }
 }
