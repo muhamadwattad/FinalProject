@@ -46,6 +46,20 @@ export default class StadiumSearch extends Component {
   }
 
   async UNSAFE_componentWillMount() {
+    
+    //CHECKING IF USER HAS LOCATION ENABLED OR NO
+    var Answer=await Location.hasServicesEnabledAsync();
+    
+    if(Answer==false){
+      var {status}=await Location.requestPermissionsAsync();
+      console.log(status);
+      //SHOW ERROR 
+    }
+    else{
+      console.log(" LOCATION IS ON!!!");
+    }
+
+
 
     await Font.loadAsync({
       'Roboto': require('native-base/Fonts/Roboto.ttf'),
@@ -80,6 +94,7 @@ export default class StadiumSearch extends Component {
 
 
   }
+  
 
 
   getstadiums = async () => {
@@ -87,6 +102,12 @@ export default class StadiumSearch extends Component {
       //TODO SHOW ERROR MESSAGE
       return;
     }
+    let { status } = await Location.requestPermissionsAsync();
+    if(status!='granted'){
+      //TODO SHOW ERROR
+    return;
+    }
+
     var url = APILINK + "getstadiumsbylocation/" + this.state.search;
     console.log(url);
     await fetch(url)
