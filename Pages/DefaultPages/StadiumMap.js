@@ -37,7 +37,6 @@ export default class StadiumMap extends Component {
             longitude: this.state.long,
           }}
           title={this.state.title}
-          icon={require("../../assets/stadiummarkericon.png")}
         />
       </MapView>
     );

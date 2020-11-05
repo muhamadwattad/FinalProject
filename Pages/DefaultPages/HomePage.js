@@ -57,11 +57,13 @@ export default class HomePage extends Component {
             <Button onPress={() => {
               this.props.navigation.toggleDrawer();
 
+              
             }} style={{ backgroundColor: 'white', color: 'blue', flex: 1 }} transparent >
               {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
               <MaterialCommunityIcons name="menu" size={30} color={HEADERBUTTONCOLOR} />
             </Button>
           </Right>
+
           <Body>
             <Text>{this.state.selecteddate}</Text>
           </Body>
