@@ -39,7 +39,7 @@ export default class TwoTeamsGame extends Component {
       selectedvalue2: "בחר קבוצה",
       games: [],
       openmodal: false,
-      error: "ERROR",
+      error: ".בחר בשתי קבוצות שונות לראות מתי הן משחקות זו נגד זו",
     };
   }
   async componentDidMount() {}
@@ -54,13 +54,13 @@ export default class TwoTeamsGame extends Component {
     var team2 = this.state.selectedvalue2;
     //CHECKING IF USER SELECTED TWO TEAMS
     if (team1 == "NOTHING" || team2 == "NOTHING") {
-      //TODO SHOW ERROR MESSAGE that says user must choose two teams
+      // SHOW ERROR MESSAGE that says user must choose two teams
       this.setState({ games: [] });
       return;
     }
     if (team1 == team2) {
-      //TODO show error message that user has to choose 2 different teams
-      this.setState({ error: "Choose two different teams." });
+      // shows error message that user has to choose 2 different teams
+      this.setState({ error: "בחר בשתי קבוצות שונות",games:[] });
     } else {
       //GETTING GAMES FROM API
 
@@ -170,7 +170,9 @@ export default class TwoTeamsGame extends Component {
         </View>
         <Content>
           {this.state.games.length == 0 || this.state.games == null ? (
-            <Text>{this.state.error}</Text>
+            <View>
+            <Text style={{ textAlign: 'center', alignItems: 'center', fontSize: 25, marginTop: '50%' }}>{this.state.error}</Text>
+            </View>
           ) : (
             <List scrollEnabled={true}>
               {this.state.games.map((game, index) => {
@@ -182,7 +184,11 @@ export default class TwoTeamsGame extends Component {
                 );
                 var matchdate = game.event_date.split(" ")[0];
                 var matchdate2 = game.event_date.split(" ")[1];
-
+                var monthtoEdit = matchdate[0] + "" + matchdate[1];
+                var daytoEdit = matchdate[3] + "" + matchdate[4];
+                var yeartoEdit = matchdate.slice(-4);
+                matchdate = daytoEdit + "/" + monthtoEdit + "/" + yeartoEdit;
+                matchdate2=matchdate2.substring(0,matchdate2.length-3)+" IT"
                 return (
                   <ListItem key={index.toString()}>
                     {/*HOME TEAM*/}
@@ -225,6 +231,7 @@ export default class TwoTeamsGame extends Component {
                         <Thumbnail source={{ uri: awayTeam.logo }} />
                       </View>
                     </View>
+                
                   </ListItem>
                 );
               })}

@@ -1,3 +1,4 @@
+import { AsyncStorage, View } from "react-native";
 import {
   Body,
   Button,
@@ -24,15 +25,14 @@ import {
 import React, { Component } from "react";
 
 import Animated from "react-native-reanimated";
-import { AsyncStorage } from "react-native";
 import { DrawerActions } from "@react-navigation/native";
 import { HEADERBUTTONCOLOR } from "../URL";
 import HomePage from "../DefaultPages/HomePage";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MoreStadium from "../DefaultPages/MoreStadium";
 import { NavigationContainer } from "@react-navigation/native";
 import StadiumSearch from "../DefaultPages/StadiumSearch";
 import TwoTeamsGame from "../DefaultPages/TwoTeamsGame";
-import MoreStadium from "../DefaultPages/MoreStadium";
 
 const Drawer = createDrawerNavigator();
 export default class MainDrawerPage extends Component {
@@ -40,6 +40,7 @@ export default class MainDrawerPage extends Component {
     return (
       <Drawer.Navigator
         drawerPosition="right"
+        overlayColor="grey"
         drawerType="slide"
         drawerContentOptions={{
           activeBackgroundColor: "#cdf8cd",
@@ -165,7 +166,8 @@ export class Sidebar extends Component {
         <Header
           style={{
             backgroundColor: this.state.background,
-            shadowOffset: { height: 1 },
+            
+          borderBottomWidth:1,borderColor:'black'
           }}
         >
           <Right>
@@ -187,7 +189,7 @@ export class Sidebar extends Component {
         <Content>
           <ListItem
             thumbnail
-            style={{ backgroundColor: this.state.background }}
+            style={{ backgroundColor: this.state.background,height:135,borderBottomWidth:1,borderBottomColor:'black' }}
           >
             <Left
               style={{
@@ -197,10 +199,10 @@ export class Sidebar extends Component {
             >
               <Thumbnail
                 source={{ uri: this.state.image }}
-                style={{ borderBottomWidth: 1 }}
+                style={{}}
               ></Thumbnail>
             </Left>
-            <Body style={{ marginRight: 15 }}>
+          <Body style={{marginRight:15,justifyContent:'center'}}>
               <H3 style={{ color: this.state.color }}>{this.state.username}</H3>
               <Text note style={{ color: this.state.color }}>
                 {this.state.email}
@@ -220,6 +222,7 @@ export class Sidebar extends Component {
           style={{
             backgroundColor: this.state.background,
             borderStartWidth: 1,
+            borderTopWidth:1
           }}
         >
           <Right>

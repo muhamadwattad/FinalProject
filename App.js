@@ -1,7 +1,10 @@
+import * as Font from "expo-font";
+
 import { AppState, AsyncStorage, BackHandler, StyleSheet, Text, View, } from 'react-native';
 import { Button, Icon } from 'native-base';
 
 import { APILINK } from './Pages/URL'
+import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import StackPage from './Pages/ScreensPages/StackPage';
@@ -24,8 +27,29 @@ export default class App extends React.Component {
       <StackPage />
     )
   }
-  componentWillUnmount() {
+  async componentWillUnmount() {
     AppState.removeEventListener('change', this._handleAppStateChange);
+
+   
+  }
+  async UNSAFE_componentWillMount(){
+     //LOADING FONT
+     await Font.loadAsync({
+      Roboto: require("native-base/Fonts/Roboto.ttf"),
+      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
+      ...Ionicons.font,
+    });
+
+    //SAVING STADIUMS IN ASYNC STORAGE
+    await fetch("http://wattad.up2app.co.il/getstadiums").then((resp)=>{
+      return resp.json();
+    }).then(async(data)=>{
+      if('Message' in data){
+        
+      }else{
+        await AsyncStorage.setItem("stadiums",JSON.stringify(data));
+      }
+    })
   }
   async componentDidMount() {
     AppState.addEventListener('change', this._handleAppStateChange);
@@ -51,17 +75,17 @@ export default class App extends React.Component {
       console.log('the app is closed');
     }
     if (nextAppState == 'background') {
-      
+
       var user = await AsyncStorage.getItem("activeuser");
       if (user != null) {
         var currentuser = JSON.parse(user);
         var url = APILINK + "updateStatus/" + currentuser.email + "/false/"
-        
+
         await fetch(url);
       }
     }
     if (nextAppState == 'active') {
-      
+
       var user = await AsyncStorage.getItem("activeuser");
       if (user != null) {
         var currentuser = JSON.parse(user);

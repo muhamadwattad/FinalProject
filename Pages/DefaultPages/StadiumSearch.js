@@ -1,16 +1,16 @@
 import * as Font from "expo-font";
-import * as Location from "expo-location";
 import * as Linking from "expo-linking";
+import * as Location from "expo-location";
+
 import { APILINK, HEADERBUTTONCOLOR } from "../URL";
-import Spinner from "react-native-loading-spinner-overlay";
 import {
+  ActivityIndicator,
   AsyncStorage,
   FlatList,
   Image,
   Modal,
   Text,
   View,
-  ActivityIndicator,
 } from "react-native";
 import {
   Body,
@@ -32,11 +32,14 @@ import {
   Thumbnail,
 } from "native-base";
 import React, { Component } from "react";
-import AwesomeAlert from "react-native-awesome-alerts";
 import { getDistance, getPreciseDistance } from "geolib";
+
+import AwesomeAlert from "react-native-awesome-alerts";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Spinner from "react-native-loading-spinner-overlay";
 import StadiumMap from "./StadiumMap";
+
 export default class StadiumSearch extends Component {
   constructor(props) {
     super(props);
@@ -54,6 +57,7 @@ export default class StadiumSearch extends Component {
     };
   }
   getlocation = async () => {
+    this.setState({ reloading: true });
     let { status } = await Location.requestPermissionsAsync();
 
     if (status !== "granted") {
@@ -74,7 +78,8 @@ export default class StadiumSearch extends Component {
       } else {
         this.setState({ search: reverseGC[0].city }, () => this.getstadiums());
       }
-    } else {
+    } 
+    else {
     }
   };
 
@@ -92,12 +97,7 @@ export default class StadiumSearch extends Component {
     } else {
       this.setState({ haslocation: true });
     }
-    //LOADING FONT
-    await Font.loadAsync({
-      Roboto: require("native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
-      ...Ionicons.font,
-    });
+
     //CHECKING IF LOCATIONS OF STADIUMS ARE ALREADY IN LOCAL STORAGE
 
     var locations = JSON.parse(await AsyncStorage.getItem("locations"));
@@ -126,6 +126,7 @@ export default class StadiumSearch extends Component {
       this.setState({ locations }, () => this.setState({ reloading: false }));
     }
   }
+ 
 
   getstadiums = async () => {
     this.setState({ reloading: true });
@@ -151,6 +152,7 @@ export default class StadiumSearch extends Component {
         if ("Message" in data) {
           this.setState({
             error: "NO STADIUMS FOUND IN THIS LOCATION",
+            stadiums: [],
             reloading: false,
           });
         } else {
@@ -173,11 +175,9 @@ export default class StadiumSearch extends Component {
     var url = `https://waze.com/ul?ll=${lat},${long}&navigate=yes`;
     Linking.openURL(url);
   };
-  showmap = async (long, lat) => {
-    console.log("MAP");
-  };
 
-  testloc = async () => {};
+
+  testloc = async () => { };
   render() {
     if (this.state.haslocation == true) {
       return (
@@ -198,20 +198,20 @@ export default class StadiumSearch extends Component {
               >
                 <Picker.Item label="מיקום" value="NO" />
                 {this.state.locations.length == 0 ||
-                this.state.locations == null ||
-                this.state.locations == "ERROR" ? (
-                  <Picker.Item label="NO" value="NO" key={999} />
-                ) : (
-                  this.state.locations.map((location, index) => {
-                    return (
-                      <Picker.Item
-                        label={location.location_hebrew}
-                        value={location.location_hebrew}
-                        key={index}
-                      />
-                    );
-                  })
-                )}
+                  this.state.locations == null ||
+                  this.state.locations == "ERROR" ? (
+                    <Picker.Item label="NO" value="NO" key={999} />
+                  ) : (
+                    this.state.locations.map((location, index) => {
+                      return (
+                        <Picker.Item
+                          label={location.location_hebrew}
+                          value={location.location_hebrew}
+                          key={index}
+                        />
+                      );
+                    })
+                  )}
               </Picker>
               <Icon
                 name="location-pin"
@@ -220,91 +220,96 @@ export default class StadiumSearch extends Component {
               />
             </Item>
           </Header>
-          <Content>
-            <Spinner
-              visible={this.state.reloading}
-              textContent="Loading..."
-              textStyle={{ color: "green" }}
-            />
-            {this.state.stadiums.length == 0 || this.state.stadiums == null ? (
-              <Text>{this.state.error}</Text>
-            ) : (
-              this.state.stadiums.map((stadium, index) => {
-                console.log(stadium);
+          {this.state.reloading ? <Spinner
+            visible={this.state.reloading}
+            textContent="מקבל נתונים"
+            textStyle={{ color: HEADERBUTTONCOLOR }}
+            animation="fade"
+            overlayColor="grey"
+            size="large"
+          /> :
+            <Content>
 
-                var pdis = getPreciseDistance(
-                  { latitude: 20.0504188, longitude: 64.4139099 },
-                  { latitude: 51.528308, longitude: -0.3817765 }
-                );
-                return (
-                  <Card key={index}>
-                    <CardItem>
-                      <Right>
-                        <Left>
-                          <Text2>{stadium.venue_hebrew_name}</Text2>
-                          <Text2 note>{stadium.venue_name}</Text2>
-                        </Left>
-                      </Right>
-                    </CardItem>
-                    <CardItem cardBody>
-                      <Image
-                        source={{
-                          uri:
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS0Bkq4BlmDylg-3UJYCa4W07Q6mfrJza8yvA&usqp=CAU",
-                        }}
-                        style={{ height: 200, width: null, flex: 1 }}
-                      />
-                    </CardItem>
-                    <CardItem>
-                      <Left>
-                        <Button
-                          transparent
-                          onPress={() =>
-                            this.setState({
-                              longsend: stadium.longitude,
-                              latsend: stadium.latitude,
-                              titlesend: stadium.venue_hebrew_name,
-                              showmodal: true,
-                            })
-                          }
-                        >
-                          <Icon
-                            name="map-marked-alt"
-                            type="FontAwesome5"
-                            style={{ color: HEADERBUTTONCOLOR }}
+              {this.state.stadiums.length == 0 || this.state.stadiums == null ? (
+                <Text>{this.state.error}</Text>
+              ) : (
+                  this.state.stadiums.map((stadium, index) => {
+
+
+                    var pdis = getPreciseDistance(
+                      { latitude: 20.0504188, longitude: 64.4139099 },
+                      { latitude: 51.528308, longitude: -0.3817765 }
+                    );
+                    return (
+                      <Card key={index}>
+                        <CardItem>
+                          <Right>
+                            <Left>
+                              <Text2>{stadium.venue_hebrew_name}</Text2>
+                              <Text2 note>{stadium.venue_name}</Text2>
+                            </Left>
+                          </Right>
+                        </CardItem>
+                        <CardItem cardBody>
+                          <Image
+                            source={{
+                              uri:
+                                "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS0Bkq4BlmDylg-3UJYCa4W07Q6mfrJza8yvA&usqp=CAU",
+                            }}
+                            style={{ height: 200, width: null, flex: 1 }}
                           />
-                          <Text2 style={{ color: HEADERBUTTONCOLOR }}>
-                            {stadium.venue_city}
+                        </CardItem>
+                        <CardItem>
+                          <Left>
+                            <Button
+                              transparent
+                              onPress={() =>
+                                this.setState({
+                                  longsend: stadium.longitude,
+                                  latsend: stadium.latitude,
+                                  titlesend: stadium.venue_hebrew_name,
+                                  showmodal: true,
+                                })
+                              }
+                            >
+                              <Icon
+                                name="map-marked-alt"
+                                type="FontAwesome5"
+                                style={{ color: HEADERBUTTONCOLOR }}
+                              />
+                              <Text2 style={{ color: HEADERBUTTONCOLOR }}>
+                                {stadium.venue_city}
+                              </Text2>
+                            </Button>
+                          </Left>
+                          <Body style={{ marginLeft: 13 }}>
+                            <Button transparent>
+                              <Icon
+                                name="chair"
+                                type="FontAwesome5"
+                                style={{ color: "#FF5254" }}
+                              />
+                              <Text2 style={{ color: "#FF5254" }}>
+                                {stadium.venue_capacity} מקומות
                           </Text2>
-                        </Button>
-                      </Left>
-                      <Body style={{ marginLeft: 13 }}>
-                        <Button transparent>
-                          <Icon
-                            name="chair"
-                            type="FontAwesome5"
-                            style={{ color: "#FF5254" }}
-                          />
-                          <Text2 style={{ color: "#FF5254" }}>
-                            {stadium.venue_capacity} מקומות
-                          </Text2>
-                        </Button>
-                      </Body>
-                      <Right style={{ marginRight: 15 }}>
-                        <MaterialCommunityIcons
-                          name="waze"
-                          style={{ fontSize: 30, color: "#31CBFD" }}
-                          onPress={() =>
-                            this.openwaze(stadium.longitude, stadium.latitude)
-                          }
-                        />
-                      </Right>
-                    </CardItem>
-                  </Card>
-                );
-              })
-            )}
-          </Content>
+                            </Button>
+                          </Body>
+                          <Right style={{ marginRight: 15 }}>
+                            <MaterialCommunityIcons
+                              name="waze"
+                              style={{ fontSize: 30, color: "#31CBFD" }}
+                              onPress={() =>
+                                this.openwaze(stadium.longitude, stadium.latitude)
+                              }
+                            />
+                          </Right>
+                        </CardItem>
+                      </Card>
+                    );
+                  })
+                )}
+            </Content>
+          }
           <Modal visible={this.state.showmodal}>
             <Header style={{ backgroundColor: "white" }}>
               <Right style={{ flex: 1, backgroundColor: "white" }}>

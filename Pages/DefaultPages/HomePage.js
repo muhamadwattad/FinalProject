@@ -7,6 +7,7 @@ import React, { Component } from 'react'
 import { APILINK } from '../URL'
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { Dimensions } from 'react-native';
+import GameInfo from "./GameInfo";
 import { HEADERBUTTONCOLOR } from '../URL';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
@@ -42,7 +43,8 @@ export default class HomePage extends Component {
       FavoriteOnOff: 'black',
       showCalendar: false,
       teams: [],
-      showError: false
+      showError: false,
+      openmodal: false,
 
     }
 
@@ -57,7 +59,7 @@ export default class HomePage extends Component {
             <Button onPress={() => {
               this.props.navigation.toggleDrawer();
 
-              
+
             }} style={{ backgroundColor: 'white', color: 'blue', flex: 1 }} transparent >
               {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
               <MaterialCommunityIcons name="menu" size={30} color={HEADERBUTTONCOLOR} />
@@ -71,7 +73,7 @@ export default class HomePage extends Component {
 
 
         </Header>
-       
+
         <Modal
           transparent={true}
 
@@ -219,13 +221,43 @@ export default class HomePage extends Component {
               this.setState({ showCalendar: true })
             }}
           >
-            <MaterialCommunityIcons name="calendar" size={30} color={HEADERBUTTONCOLOR} style={{ margin: 8 }} />
+            <MaterialCommunityIcons name="calendar" size={30} style={{ margin: 8 }} />
           </TouchableOpacity>
         </View>
 
         <Content scrollEnabled={true}>
+          {/* GAME INFO MODAL */}
+          <Modal visible={this.state.openmodal}>
+            <Header style={{ backgroundColor: "white" }}>
+              <Right style={{ flex: 1 }}>
+                <Button
+                  onPress={() => {
+                    this.setState({ openmodal: false });
+                  }}
+                  style={{ backgroundColor: "white", color: "blue", flex: 1 }}
+                  transparent
+                >
+                  {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
+                  <MaterialCommunityIcons
+                    name="close"
+                    size={30}
+                    color={HEADERBUTTONCOLOR}
+                  />
+                </Button>
+              </Right>
+              <Body>
+                <Text>TEST TEST</Text>
+              </Body>
+            </Header>
 
+            <GameInfo
+              game={this.state.gameinfo}
+              homeTeam={this.state.homeTeam}
+              awayTeam={this.state.awayTeam}
+            />
+          </Modal>
 
+          {/* POP UP FOR ERROR THAT NO GAMES WERE FOUND*/}
           <AwesomeAlert
             show={this.state.showError}
             showProgress={false}
@@ -245,8 +277,19 @@ export default class HomePage extends Component {
               this.setState({ showError: false })
             }}
           />
+          {/* GAMES LIST */}
+          {this.state.games == "No Games Found" || this.state.games.length == 0 ?
 
-          {this.state.games == "No Games Found" || this.state.games.length == 0 ? <Text>NULL</Text> :
+            // IF THERE IS NO GAMES IN THAT DATE
+            <View>
+              <Text style={{ textAlign: 'center', alignItems: 'center', fontSize: 30, marginTop: '50%' }} >
+                לא נמצאו משחקים בתאריך הזה.
+          </Text>
+              <Text2 note style={{ textAlign: 'center', alignItems: 'center', marginTop: 10 }} >תבחר תאריך אחר על ידי לחיצה על תאריך או על ידיד בחירת תאריך</Text2>
+            </View>
+
+            :
+            //IF THERE IS GAMES IN THAT DATE
             <List scrollEnabled={true} onScroll={(e) => {
 
             }}>
@@ -260,25 +303,58 @@ export default class HomePage extends Component {
                   var homeTeam = this.state.teams.find(team => team.team_id == game.homeTeamCode);
                   var awayTeam = this.state.teams.find(team => team.team_id == game.awayTeamCode);
                   var matchdate = game.event_date.split(" ")[1];
-                  
+                 
+                  matchdate=matchdate.slice(0,-3);
+                  var matchdate2 = game.event_date.split(" ")[0];
+                  var monthtoEdit = matchdate2[0] + "" + matchdate2[1];
+                  var daytoEdit = matchdate2[3] + "" + matchdate2[4];
+                  var yeartoEdit = matchdate2.slice(-4);
+                  matchdate2 = daytoEdit + "/" + monthtoEdit + "/" + yeartoEdit;
 
                   return (
                     <ListItem key={index.toString()}>
 
                       {/*HOME TEAM*/}
-                      <View style={{ justifyContent: 'space-between', flexDirection: 'row', width: '100%', display: 'flex', }}>
-                        <View style={{ alignItems: 'flex-start' }}>
+                      <View
+                        style={{
+                          justifyContent: "space-between",
+                          flexDirection: "row",
+                          width: "100%",
+                          display: "flex",
+                        }}
+                      >
+                        <View style={{ alignItems: "flex-start" }}>
                           <Thumbnail source={{ uri: homeTeam.logo }} />
                         </View>
-                        <View style={{ borderColor: 'black', }}>
-                          <Text style={{ textAlign: 'center' }}> {matchdate}</Text>
-                          <Text2 note> TEST TEST</Text2>
+                        <View style={{ borderColor: "black" }}>
+                          <Text style={{ textAlign: "center" }}>
+                            {" "}
+                            {matchdate}
+                          </Text>
+
+                          <Text2 note>{matchdate2}</Text2>
+                          <Text2
+                            note
+                            style={{ color: "#228B22" }}
+                            onPress={() => {
+                              this.setState({
+                                openmodal: true,
+                                gameinfo: game,
+                                homeTeam,
+                                awayTeam,
+                              });
+                            }}
+                          >
+                            {" "}
+                          צפיה בפרטי המשחק
+                        </Text2>
                         </View>
                         {/*AWAY TEAM*/}
-                        <View style={{ alignItems: 'flex-end' }}>
+                        <View style={{ alignItems: "flex-end" }}>
                           <Thumbnail source={{ uri: awayTeam.logo }} />
                         </View>
                       </View>
+
                     </ListItem>
                   )
                 })
@@ -296,7 +372,7 @@ export default class HomePage extends Component {
     //getting teams
     var teams = await JSON.parse(await AsyncStorage.getItem("teams"));
     this.setState({ teams }, () => {
-
+      console.log(teams);
     });
 
     //updating user's status TO ACTIVE
@@ -305,13 +381,29 @@ export default class HomePage extends Component {
     var currentuser = JSON.parse(user);
     var url = APILINK + "updateStatus/" + currentuser.email + "/true/"
     await fetch(url);
+    //GETTING GAMES
+    //GETTING TODAY's GAMES AND SAVING THEM INTO THE STATE
 
-    if (this.state.games == "No Games Found") {
+    var TodayDate = TurnDate(this.state.todaystring);
+    var url = APILINK + "getgamesbydate/" + TodayDate + "/";
+    console.log(url);
 
-    }
-    else {
 
-    }
+    await fetch(url).then((resp) => {
+      return resp.json();
+    }).then(async (data) => {
+      //CHECKING IF GAMES HAS BEEN ADDED SUCCESFULLY
+      if ('Message' in data) {
+        //SHOWING ERROR MESSAGE
+        this.setState({ games: "No Games Found" });
+        this.setState({ showError: true });
+
+      }
+      else {
+        //SAVING GAMES INTO ARRAY IN THE STATE AND IN STATE
+        this.setState({ games: data });
+      }
+    });
 
 
   }
@@ -392,38 +484,9 @@ export default class HomePage extends Component {
     this.setState({ GameDayDate });
 
   }
-  getGames = async () => {
-    //GETTING TODAY's GAMES AND SAVING THEM INTO THE ASYNC STORAGE
-
-    var TodayDate = TurnDate(this.state.todaystring);
-    var url = APILINK + "getgamesbydate/" + TodayDate + "/";
-    
-    
-
-    await fetch(url).then((resp) => {
-      return resp.json();
-    }).then(async (data) => {
-      //CHECKING IF GAMES HAS BEEN ADDED SUCCESFULLY
-      if ('Message' in data) {
-        //SHOWING ERROR MESSAGE
-        this.setState({ games: "No Games Found" });
-        this.setState({ showError: true });
-
-      }
-      else {
-        //SAVING GAMES INTO ARRAY IN THE STATE AND IN ASYNC STORAGE 
-        this.setState({ games: data });
-
-
-
-      }
-    });
-  }
 
   async UNSAFE_componentWillMount() {
     await this.getDates();
-
-    await this.getGames();
   }
 
 
