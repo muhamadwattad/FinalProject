@@ -34,14 +34,14 @@ export default class MoreStadium extends Component {
 
         </Header>
         <Tabs tabBarUnderlineStyle={{borderBottomWidth:2}} initialPage={1}  >
-          <Tab heading="test" heading={<TabHeading><Icon name="location-pin" type="Entypo" /><Text2>location</Text2></TabHeading>}>
+          <Tab heading="test" heading={<TabHeading><Icon name="location-pin" type="Entypo" /><Text2>Location</Text2></TabHeading>}>
           <SortByTeamsTab></SortByTeamsTab>
           </Tab>
          
-          <Tab heading={<TabHeading><Icon name="time" type="Ionicons" /><Text2>time</Text2></TabHeading>}>
+          <Tab heading={<TabHeading><Icon name="time" type="Ionicons" /><Text2>Time</Text2></TabHeading>}>
             <SortByDateTab></SortByDateTab>
           </Tab>
-          <Tab heading={<TabHeading><Icon name="team" type="AntDesign" /><Text2>teams</Text2></TabHeading>}>
+          <Tab heading={<TabHeading><Icon name="team" type="AntDesign" /><Text2>Teams</Text2></TabHeading>}>
             <SortByLocationTab/>
           </Tab>
         </Tabs>

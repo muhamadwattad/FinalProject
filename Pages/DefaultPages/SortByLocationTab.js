@@ -8,6 +8,7 @@ import {
   FlatList,
   Image,
   Modal,
+  RefreshControl,
   Text,
   View,
 } from "react-native";
@@ -37,6 +38,7 @@ import AwesomeAlert from "react-native-awesome-alerts";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Spinner from "react-native-loading-spinner-overlay";
+import StadiumInfo from './StadiumInfo'
 
 export default class SortByLocationTab extends Component {
   constructor(props) {
@@ -48,7 +50,9 @@ export default class SortByLocationTab extends Component {
       longitude: 0,
       latitude: 0,
       stadiums: [],
-      loading: false
+      loading: false,
+      refreshing: false,
+      showmodal: false
     }
   }
   async componentDidMount() {
@@ -127,13 +131,18 @@ export default class SortByLocationTab extends Component {
 
   }
 
-  async UNSAFE_componentWillMount() {
-    console.log("CAME HERE")
+  loadData = async () => {
     //GETTING USER's LOCATION AND SAVING THEM INTO STATE.
+
     await this.getUserLocation();
     //GETTING STADIUMS FROM API
     if (this.state.dontload == false)
       await this.getStadiums();
+
+  }
+  async UNSAFE_componentWillMount() {
+    this.loadData();
+
   }
   render() {
     if (this.state.dontload == true) {
@@ -144,7 +153,7 @@ export default class SortByLocationTab extends Component {
       )
     } else {
       return (
-        <Content>
+        <Content >
           <Spinner
             visible={this.state.loading}
             textContent="מקבל נתונים"
@@ -153,35 +162,60 @@ export default class SortByLocationTab extends Component {
             overlayColor="grey"
             size="large"
           />
+          <Modal visible={this.state.showmodal} animationType="slide" style={{height:150,width:'100%'}}>
+            <Header style={{ backgroundColor: "white" }}>
+              <Right style={{ flex: 1 }}>
+                <Button
+                  onPress={() => {
+                    this.setState({ showmodal: false });
+                  }}
+                  style={{ backgroundColor: "white", color: "blue", flex: 1 }}
+                  transparent
+                >
 
-          
-            {this.state.stadiums == null || this.state.stadiums.length == 0 ? <Text>HI</Text> :
-              <List>
-                {
-                  this.state.stadiums.map((stadium, index) => {
-                    console.log(stadium);
-                    return (
-                      <ListItem thumbnail style={{margin:3}}>
-                        <Left>
-                          <Thumbnail square source={{ uri: RANDOMIMAGEURL}} />
-                        </Left>
-                        <Body>
-                          <Text2>{stadium.venue_hebrew_name}</Text2>
-                          <Text2 note numberOfLines={1}>{stadium.venue_hebrew_city}</Text2>
-                          <Text2 note>{stadium.distance} KM</Text2>
-                        </Body>
-                        <Right>
-                          <Button transparent>
-                            <Text2>View</Text2>
-                          </Button>
-                        </Right>
-                      </ListItem>
-                    )
-                  })}
-              </List>
-            }
+                  <MaterialCommunityIcons
+                    name="close"
+                    size={30}
+                    color={HEADERBUTTONCOLOR}
+                  />
+                </Button>
+              </Right>
+            </Header>
+            
+              <StadiumInfo stadium={this.state.stadium} />
+            
+          </Modal>
 
-          
+
+          {this.state.stadiums == null || this.state.stadiums.length == 0 ? <Text>HI</Text> :
+            <List
+
+            >
+              {
+                this.state.stadiums.map((stadium, index) => {
+
+                  return (
+                    <ListItem thumbnail style={{ margin: 3 }} key={index.toString()}>
+                      <Left>
+                        <Thumbnail square source={{ uri: RANDOMIMAGEURL }} />
+                      </Left>
+                      <Body>
+                        <Text2>{stadium.venue_hebrew_name}</Text2>
+                        <Text2 note numberOfLines={1}>{stadium.venue_hebrew_city}</Text2>
+                        <Text2 note>{stadium.distance} ק"מ</Text2>
+                      </Body>
+                      <Right>
+                        <Button transparent onPress={() => this.setState({ stadium, showmodal: true })}>
+                          <Text2>עוד</Text2>
+                        </Button>
+                      </Right>
+                    </ListItem>
+                  )
+                })}
+            </List>
+          }
+
+
         </Content>
       )
     }

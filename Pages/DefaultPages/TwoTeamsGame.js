@@ -238,7 +238,7 @@ export default class TwoTeamsGame extends Component {
             </List>
           )}
         </Content>
-        <Modal visible={this.state.openmodal}>
+        <Modal visible={this.state.openmodal} animationType="slide">
           <Header style={{ backgroundColor: "white" }}>
             <Right style={{ flex: 1 }}>
               <Button
