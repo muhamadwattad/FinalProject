@@ -1,4 +1,4 @@
-import { Body, Button, Container, Content, Header, Icon, Left, List, ListItem, Right, Tab, TabHeading, Tabs, Text as Text2, Thumbnail } from 'native-base';
+import { Body, Button, Container, Content, Header, Icon, Left, List, ListItem, Right, Text as Text2, Thumbnail } from 'native-base';
 import React, { Component } from 'react'
 import { Text, View } from 'react-native'
 
@@ -10,42 +10,42 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SortByDateTab from './SortByDateTab';
 import SortByLocationTab from './SortByLocationTab';
 import SortByTeamsTab from './SortByTeamsTab';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import moment from 'moment'
 
+const Tab = createBottomTabNavigator();
 export default class MoreStadium extends Component {
   render() {
     return (
-      <Container>
-        <Header style={{ backgroundColor: 'white' }} hasTabs>
+      <Tab.Navigator>
+        <Tab.Screen name="Teams" component={SortByTeamsTab} 
+        options={{
+          tabBarIcon:({color,size})=>(
+            <Icon name="team" type="AntDesign" />
+          )
+        }}
+        
+        
+        
+        
+        />
+        <Tab.Screen name="Time" component={SortByDateTab}options={{
+          tabBarIcon:({color,size})=>(
+            <Icon name="time" type="Ionicons" />
+          )
+        }} />
+        <Tab.Screen name="Location" component={SortByLocationTab} 
+        
+        options={{
+          tabBarIcon:({color,size})=>(
+            <Icon name="location-pin" type="Entypo" />
+          )
+        }}
+        />
+      </Tab.Navigator>
 
-          <Right style={{ flex: 1 }} >
-
-            <Button onPress={() => {
-              this.props.navigation.toggleDrawer();
 
 
-            }} style={{ backgroundColor: 'white', color: 'blue', flex: 1 }} transparent >
-              {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
-              <MaterialCommunityIcons name="menu" size={30} color={HEADERBUTTONCOLOR} />
-            </Button>
-          </Right>
-
-
-
-        </Header>
-        <Tabs tabBarUnderlineStyle={{borderBottomWidth:2}} initialPage={1}  >
-          <Tab heading="test" heading={<TabHeading><Icon name="location-pin" type="Entypo" /><Text2>Location</Text2></TabHeading>}>
-          <SortByTeamsTab></SortByTeamsTab>
-          </Tab>
-         
-          <Tab heading={<TabHeading><Icon name="time" type="Ionicons" /><Text2>Time</Text2></TabHeading>}>
-            <SortByDateTab></SortByDateTab>
-          </Tab>
-          <Tab heading={<TabHeading><Icon name="team" type="AntDesign" /><Text2>Teams</Text2></TabHeading>}>
-            <SortByLocationTab/>
-          </Tab>
-        </Tabs>
-      </Container>
     )
   }
 }

@@ -1,4 +1,5 @@
 import { Alert, AsyncStorage, FlatList, I18nManager, Image, Keyboard, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Container, Header } from "native-base";
 import React, { Component } from 'react';
 
 import { APILINK } from '../URL'
@@ -40,7 +41,7 @@ export default class LoginPage extends Component {
 
 
 
-        
+
         await AsyncStorage.setItem("activeuser", JSON.stringify(data));
         this.props.navigation.navigate("DefaultPages");
       }
@@ -48,18 +49,17 @@ export default class LoginPage extends Component {
 
 
   }
-  async componentDidMount(){
+  async componentDidMount() {
     var user = await AsyncStorage.getItem("activeuser");
-    if(user!=null)
-    {
+    if (user != null) {
       //TODO CHECK IF USER WANTS TO GET HIS FINGERPRINTS! (AsyncStorage)
 
       this.props.navigation.navigate("DefaultPages");
     }
-    
-    
-    
-    
+
+
+
+
   }
   SignUp = () => {
     this.props.navigation.navigate("Signup");
@@ -69,8 +69,9 @@ export default class LoginPage extends Component {
 
     return (
 
-      <ScrollView style={styles.container} >
+     <Container>
 
+       
         <View>
           <View style={{ marginTop: 0, alignItems: "center", justifyContent: "center" }}>
             <Image source={require("../../assets/logo.jpg")} style={{ height: 220 }} />
@@ -144,7 +145,7 @@ export default class LoginPage extends Component {
             אין לך חשבון ? <Text style={[styles.text, styles.link]} onPress={this.SignUp}>הירשם </Text>
           </Text>
         </View>
-      </ScrollView>
+      </Container>
     );
   }
 }

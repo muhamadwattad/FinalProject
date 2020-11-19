@@ -66,9 +66,7 @@ export default class HomePage extends Component {
             </Button>
           </Right>
 
-          <Body>
-            <Text>{this.state.selecteddate}</Text>
-          </Body>
+     
 
 
 
@@ -245,9 +243,7 @@ export default class HomePage extends Component {
                   />
                 </Button>
               </Right>
-              <Body>
-                <Text>TEST TEST</Text>
-              </Body>
+             
             </Header>
 
             <GameInfo

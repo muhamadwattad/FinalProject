@@ -79,6 +79,26 @@ export default class SortByDateTab extends Component {
     }
     else {
       return (
+        <Container>
+          <Header style={{ backgroundColor: "white" }}>
+          <Right style={{ flex: 1 }}>
+            <Button
+              onPress={() => {
+                this.props.navigation.toggleDrawer();
+              }}
+              style={{ backgroundColor: "white", color: "blue", flex: 1 }}
+              transparent
+            >
+              {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
+              <MaterialCommunityIcons
+                name="menu"
+                size={30}
+                color={HEADERBUTTONCOLOR}
+              />
+            </Button>
+          </Right>
+        </Header>
+
         <Content>
           {this.state.stadiums == null || this.state.stadiums.length == 0 ? <Text>Getting Stadiums...</Text> :
             <List
@@ -134,6 +154,7 @@ export default class SortByDateTab extends Component {
 
 
         </Content>
+        </Container>
       )
     }
   }
