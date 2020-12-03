@@ -25,6 +25,7 @@ import {
 import React, { Component } from "react";
 
 import Animated from "react-native-reanimated";
+import AwesomeAlert from 'react-native-awesome-alerts';
 import { DrawerActions } from "@react-navigation/native";
 import { HEADERBUTTONCOLOR } from "../URL";
 import HelpPage from "../DefaultPages/HelpPage";
@@ -112,7 +113,7 @@ export default class MainDrawerPage extends Component {
             title: "אצטדיון פלוס",
           }}
         />
-        
+
         <Drawer.Screen
           name="Settings"
           title="הגדרות"
@@ -162,7 +163,7 @@ export class Sidebar extends Component {
       background: "white",
       color: "#131313",
       image: "https://static.thenounproject.com/png/340719-200.png",
-      showmodal:false
+      showmodal: false
     };
   }
 
@@ -170,10 +171,8 @@ export class Sidebar extends Component {
     this.getData();
   }
   logout = async () => {
-    var activeuser = await AsyncStorage.getItem("activeuser");
-    console.log(activeuser);
-   await this.props.navigation.dispatch(DrawerActions.closeDrawer());
-    this.setState({showmodal:true});
+    await this.props.navigation.dispatch(DrawerActions.closeDrawer());
+    this.setState({ showmodal: true });
   };
 
   getData = async () => {
@@ -204,8 +203,8 @@ export class Sidebar extends Component {
         <Header
           style={{
             backgroundColor: this.state.background,
-            
-          borderBottomWidth:1,borderColor:'black'
+
+            borderBottomWidth: 1, borderColor: 'black'
           }}
         >
           <Right>
@@ -219,23 +218,39 @@ export class Sidebar extends Component {
               <Icon
                 name="menu"
                 style={{ color: "#228B22" }}
-                onPress={() => {}}
+                onPress={() => { }}
               />
             </Button>
           </Right>
         </Header>
         <Content>
-          <Modal visible={this.state.showmodal}>
-            <Button onPress={() =>this.setState({showmodal:false})}>
-              <Text>CLOSE</Text>
-            </Button>
-            <View style={{flex:1}}>
-              <Text> Test</Text>
-            </View>
-          </Modal>
+          <AwesomeAlert
+            show={this.state.showmodal}
+            showProgress={false}
+            title="אישור התנתקות"
+            message="האפליקציה תבקש להזין את המידע שלך שוב."
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showCancelButton={true}
+            showConfirmButton={true}
+            cancelText="לא"
+            confirmText="כן"
+            confirmButtonColor="#DD6B55"
+            onCancelPressed={() => {
+              this.setState({ showmodal: false })
+            }}
+            onConfirmPressed={async () => {
+              //Logging out
+              //Removing user and his settings
+              await AsyncStorage.removeItem("activeuser");
+              this.setState({ showmodal: false }, () => {
+                this.props.navigation.navigate("Login");
+              })
+            }}
+          />
           <ListItem
             thumbnail
-            style={{ backgroundColor: this.state.background,height:135,borderBottomWidth:1,borderBottomColor:'black' }}
+            style={{ backgroundColor: this.state.background, height: 135, borderBottomWidth: 1, borderBottomColor: 'black' }}
           >
             <Left
               style={{
@@ -248,7 +263,7 @@ export class Sidebar extends Component {
                 style={{}}
               ></Thumbnail>
             </Left>
-          <Body style={{marginRight:15,justifyContent:'center'}}>
+            <Body style={{ marginRight: 15, justifyContent: 'center' }}>
               <H3 style={{ color: this.state.color }}>{this.state.username}</H3>
               <Text note style={{ color: this.state.color }}>
                 {this.state.email}
@@ -268,7 +283,7 @@ export class Sidebar extends Component {
           style={{
             backgroundColor: this.state.background,
             borderStartWidth: 1,
-            borderTopWidth:1
+            borderTopWidth: 1
           }}
         >
           <Right>
