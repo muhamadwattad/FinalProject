@@ -1,7 +1,6 @@
 import { Agenda, Calendar, CalendarList } from 'react-native-calendars';
 import { Animated, AsyncStorage, FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Body, Button, Container, Content, Header, Icon, Left, List, ListItem, Right, Text as Text2, Thumbnail } from 'native-base';
-import { Cell, Col, Cols, Row, Rows, Table, TableWrapper } from 'react-native-table-component';
 import React, { Component } from 'react'
 
 import { APILINK } from '../URL'

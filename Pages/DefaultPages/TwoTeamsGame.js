@@ -23,6 +23,7 @@ import {
 import React, { Component } from "react";
 
 import { APILINK } from "../URL";
+import AwesomeAlert from "react-native-awesome-alerts";
 import DropDownPicker from "react-native-dropdown-picker";
 import GameInfo from "./GameInfo";
 import { HEADERBUTTONCOLOR } from "../URL";
@@ -40,6 +41,7 @@ export default class TwoTeamsGame extends Component {
       games: [],
       openmodal: false,
       error: ".בחר בשתי קבוצות שונות לראות מתי הן משחקות זו נגד זו",
+      showError:false
     };
   }
   async componentDidMount() {}
@@ -60,7 +62,8 @@ export default class TwoTeamsGame extends Component {
     }
     if (team1 == team2) {
       // shows error message that user has to choose 2 different teams
-      this.setState({ error: "בחר בשתי קבוצות שונות",games:[] });
+      this.setState({ error: "בחר בשתי קבוצות שונות",games:[],showError:true
+     });
     } else {
       //GETTING GAMES FROM API
 
@@ -71,9 +74,10 @@ export default class TwoTeamsGame extends Component {
           return resp.json();
         })
         .then((data) => {
-          console.log(data);
+          
           if ("Message" in data) {
-            this.setState({ error: "Could not find matches please reload!" });
+            console.log("test");
+            this.setState({ error: "לא נמצאו משחקים בין שתי הקבוצות.",games:[],showError:true,showError:true });
           } else {
             this.setState({ games: data });
           }
@@ -100,9 +104,7 @@ export default class TwoTeamsGame extends Component {
               />
             </Button>
           </Right>
-          <Body>
-            <Text>TEST TEST</Text>
-          </Body>
+        
         </Header>
 
         <View
@@ -238,6 +240,28 @@ export default class TwoTeamsGame extends Component {
             </List>
           )}
         </Content>
+
+
+        <AwesomeAlert
+            show={this.state.showError}
+            showProgress={false}
+            title="שְׁגִיאָה!"
+            message={this.state.error}
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            cancelText="No, cancel"
+            confirmText="לְהַמשִׁיך"
+            confirmButtonColor="#DD6B55"
+            onCancelPressed={() => {
+              this.setState({ showError: false })
+            }}
+            onConfirmPressed={() => {
+              this.setState({ showError: false })
+            }}
+          />
+
         <Modal visible={this.state.openmodal} animationType="slide">
           <Header style={{ backgroundColor: "white" }}>
             <Right style={{ flex: 1 }}>

@@ -1,5 +1,6 @@
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 import React, { Component } from "react";
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+
 import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
 
@@ -26,13 +27,15 @@ export default class StadiumMap extends Component {
         region={{
           latitude: this.state.lat,
           longitude: this.state.long,
-          latitudeDelta: 0.0122,
-          longitudeDelta: 0.0121,
+          latitudeDelta:  0.09,
+          longitudeDelta :0.09,
         }}
       >
         <Marker
           flat={true}
           coordinate={{
+            latitudeDelta:0.09,
+            longitudeDelta:0.09,
             latitude: this.state.lat,
             longitude: this.state.long,
           }}

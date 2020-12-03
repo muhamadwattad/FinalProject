@@ -30,24 +30,36 @@ export default class App extends React.Component {
   async componentWillUnmount() {
     AppState.removeEventListener('change', this._handleAppStateChange);
 
-   
+
   }
-  async UNSAFE_componentWillMount(){
-     //LOADING FONT
-     await Font.loadAsync({
+  async UNSAFE_componentWillMount() {
+    //LOADING FONT
+    await Font.loadAsync({
       Roboto: require("native-base/Fonts/Roboto.ttf"),
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
       ...Ionicons.font,
     });
 
     //SAVING STADIUMS IN ASYNC STORAGE
-    await fetch("http://wattad.up2app.co.il/getstadiums").then((resp)=>{
+    await fetch("http://wattad.up2app.co.il/getstadiums").then((resp) => {
       return resp.json();
-    }).then(async(data)=>{
-      if('Message' in data){
-        
-      }else{
-        await AsyncStorage.setItem("stadiums",JSON.stringify(data));
+    }).then(async (data) => {
+      if ('Message' in data) {
+
+      } else {
+        await AsyncStorage.setItem("stadiums", JSON.stringify(data));
+      }
+    })
+
+    //SAVING TEAMS IN ASYNC STORAGE
+    await fetch("http://wattad.up2app.co.il/getteams").then((resp) => {
+      return resp.json();
+    }).then(async(data) => {
+      if ('Message' in data) {
+
+      }
+      else {
+        await AsyncStorage.setItem("teams", JSON.stringify(data));
       }
     })
   }

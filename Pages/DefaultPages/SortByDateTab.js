@@ -50,6 +50,7 @@ export default class SortByDateTab extends Component {
 
   }
   async UNSAFE_componentWillMount() {
+    //GETTING STADIUMS FROM ASYNC STORAGE AND SAVING THEM INTO STATE
     let stadiums = await AsyncStorage.getItem("stadiums");
     if (stadiums == null || stadiums.length == 0) {
       await fetch(APILINK + "getstadiums/").then((resp) => {
@@ -81,54 +82,60 @@ export default class SortByDateTab extends Component {
       return (
         <Container>
           <Header style={{ backgroundColor: "white" }}>
-          <Right style={{ flex: 1 }}>
-            <Button
-              onPress={() => {
-                this.props.navigation.toggleDrawer();
-              }}
-              style={{ backgroundColor: "white", color: "blue", flex: 1 }}
-              transparent
-            >
-              {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
-              <MaterialCommunityIcons
-                name="menu"
-                size={30}
-                color={HEADERBUTTONCOLOR}
-              />
-            </Button>
-          </Right>
-        </Header>
+            <Right style={{ flex: 1 }}>
+              <Button
+                onPress={() => {
+                  this.props.navigation.toggleDrawer();
+                }}
+                style={{ backgroundColor: "white", color: "blue", flex: 1 }}
+                transparent
+              >
+                {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
+                <MaterialCommunityIcons
+                  name="menu"
+                  size={30}
+                  color={HEADERBUTTONCOLOR}
+                />
+              </Button>
+            </Right>
+          </Header>
 
-        <Content>
-          {this.state.stadiums == null || this.state.stadiums.length == 0 ? <Text>Getting Stadiums...</Text> :
-            <List
 
-            >
-              {
-                this.state.stadiums.map((stadium, index) => {
+          {this.state.stadiums == null || this.state.stadiums.length == 0 ? <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'smoke', height: '100%' }} >
+            <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} /><Text2>מקבל נתונים...</Text2></View> :
+            <Content>
+              <List
+              //GETTING STADIUMS FROM STATE AND RETURNING THEM AS A LIST
+              >
+                {
+                  this.state.stadiums.map((stadium, index) => {
+                    var stadiumImageUrl = stadium.venue_name;
+                    stadiumImageUrl = stadiumImageUrl.replace(/ /g, '');
+                    stadiumImageUrl = APILINK + "stadiumimages/" + stadiumImageUrl + ".jpg"
+                    return (
+                      <ListItem thumbnail style={{ margin: 3 }} key={index.toString()}>
+                        <Left>
+                          <Thumbnail square source={{ uri: stadiumImageUrl }} />
+                        </Left>
+                        <Body>
+                          <Text2>{stadium.venue_hebrew_name}</Text2>
+                          <Text2 note>{stadium.venue_name}</Text2>
+                          <Text2 note numberOfLines={1}>{stadium.venue_hebrew_city}</Text2>
 
-                  return (
-                    <ListItem thumbnail style={{ margin: 3 }} key={index.toString()}>
-                      <Left>
-                        <Thumbnail square source={{ uri: RANDOMIMAGEURL }} />
-                      </Left>
-                      <Body>
-                        <Text2>{stadium.venue_hebrew_name}</Text2>
-                        <Text2 note>{stadium.venue_name}</Text2>
-                        <Text2 note numberOfLines={1}>{stadium.venue_hebrew_city}</Text2>
-
-                      </Body>
-                      <Right>
-                        <Button transparent onPress={() => this.setState({ stadium, showmodal: true })}>
-                          <Text2>משחקים</Text2>
-                        </Button>
-                      </Right>
-                    </ListItem>
-                  )
-                })}
-            </List>
+                        </Body>
+                        <Right>
+                          <Button transparent onPress={() => this.setState({ stadium, showmodal: true })}>
+                            <Text2>משחקים</Text2>
+                          </Button>
+                        </Right>
+                      </ListItem>
+                    )
+                  })}
+              </List>
+            </Content>
           }
           <Modal visible={this.state.showmodal} animationType="fade" >
+            {/* MODAL FOR STADIUM INFO */}
             <Header style={{ backgroundColor: "white" }}>
               <Right style={{ flex: 1 }}>
                 <Button
@@ -153,7 +160,7 @@ export default class SortByDateTab extends Component {
           </Modal>
 
 
-        </Content>
+
         </Container>
       )
     }

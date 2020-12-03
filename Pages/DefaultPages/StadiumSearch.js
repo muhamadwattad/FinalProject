@@ -19,6 +19,9 @@ import {
   CardItem,
   Container,
   Content,
+  H2,
+  H3,
+  H4,
   Header,
   Icon,
   Input,
@@ -52,12 +55,13 @@ export default class StadiumSearch extends Component {
       t: null,
       showmodal: false,
       haslocation: true,
-      error: "choose location or take your location",
+      error: "בחר במיקום או השתמש במיקום שלך.",
       reloading: false,
+      showError:false
     };
   }
   getlocation = async () => {
-    this.setState({ reloading: true });
+    this.setState({ reloading: true, search: "NO" });
     let { status } = await Location.requestPermissionsAsync();
 
     if (status !== "granted") {
@@ -66,9 +70,10 @@ export default class StadiumSearch extends Component {
       });
     }
     let location = await Location.getCurrentPositionAsync({});
+
     if (location) {
       let reverseGC = await Location.reverseGeocodeAsync(location.coords);
-
+      console.log(reverseGC);
       if (
         reverseGC[0].city == null ||
         reverseGC[0].city == undefined ||
@@ -78,7 +83,7 @@ export default class StadiumSearch extends Component {
       } else {
         this.setState({ search: reverseGC[0].city }, () => this.getstadiums());
       }
-    } 
+    }
     else {
     }
   };
@@ -126,13 +131,13 @@ export default class StadiumSearch extends Component {
       this.setState({ locations }, () => this.setState({ reloading: false }));
     }
   }
- 
+
 
   getstadiums = async () => {
     this.setState({ reloading: true });
     if (this.state.search == "NO") {
       //TODO SHOW ERROR MESSAGE
-      this.setState({ error: "CHOOSE A LOCATION" });
+      this.setState({ error:"בחר במיקום או השתמש במיקום שלך.", reloading: false,showError:true });
       return;
     }
     let { status } = await Location.requestPermissionsAsync();
@@ -140,6 +145,9 @@ export default class StadiumSearch extends Component {
       this.setState({ haslocation: false, reloading: false });
       return;
     }
+
+    if (this.state.search == "Tel Aviv-Yafo")
+      this.setState({ search: "tel aviv" });
 
     var url = APILINK + "getstadiumsbylocation/" + this.state.search;
     console.log(url);
@@ -151,9 +159,10 @@ export default class StadiumSearch extends Component {
         console.log(data);
         if ("Message" in data) {
           this.setState({
-            error: "NO STADIUMS FOUND IN THIS LOCATION",
+            error: "לא נמצאו אצטדיונים במיקום זה",
             stadiums: [],
             reloading: false,
+            showError:true
           });
         } else {
           for (var i = 0; i < data.length; i++) {
@@ -163,10 +172,10 @@ export default class StadiumSearch extends Component {
             data[i].latitude = LongLatLocation[0].latitude;
             data[i].longitude = LongLatLocation[0].longitude;
           }
-          this.setState({ stadiums: data, reloading: false });
+          this.setState({ stadiums: data, reloading: false, search: "NO" });
         }
       });
-    this.setState({ reloading: false });
+    this.setState({ reloading: false, search: "NO" });
   };
 
   openwaze = async (long, lat) => {
@@ -220,41 +229,35 @@ export default class StadiumSearch extends Component {
               />
             </Item>
           </Header>
-          {this.state.reloading ? <Spinner
-            visible={this.state.reloading}
-            textContent="מקבל נתונים"
-            textStyle={{ color: HEADERBUTTONCOLOR }}
-            animation="fade"
-            overlayColor="grey"
-            size="large"
-          /> :
+
+          {this.state.reloading ? <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'smoke', height: '100%' }} >
+            <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} /><Text2>מקבל נתונים...</Text2></View> :
             <Content>
 
               {this.state.stadiums.length == 0 || this.state.stadiums == null ? (
-                <Text>{this.state.error}</Text>
+                <View><Text style={{ textAlign: 'center', alignItems: 'center', fontSize: 28, marginTop: '50%' }}>{this.state.error}</Text></View>
               ) : (
                   this.state.stadiums.map((stadium, index) => {
+                    var stadiumImageUrl = stadium.venue_name;
+                    stadiumImageUrl = stadiumImageUrl.replace(/ /g, '');
+                    stadiumImageUrl = APILINK + "stadiumimages/" + stadiumImageUrl + ".jpg"
 
-
-                    var pdis = getPreciseDistance(
-                      { latitude: 20.0504188, longitude: 64.4139099 },
-                      { latitude: 51.528308, longitude: -0.3817765 }
-                    );
                     return (
                       <Card key={index}>
                         <CardItem>
-                          <Right>
-                            <Left>
-                              <Text2>{stadium.venue_hebrew_name}</Text2>
-                              <Text2 note>{stadium.venue_name}</Text2>
-                            </Left>
-                          </Right>
+                          <Body style={{ width: '100%' }}>
+                            <View style={{ width: '100%' }}>
+                              <Text2 style={{ textAlign: 'center' }}>{stadium.venue_hebrew_name}</Text2>
+
+                            </View>
+
+                          </Body>
                         </CardItem>
                         <CardItem cardBody>
                           <Image
                             source={{
                               uri:
-                                "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcS0Bkq4BlmDylg-3UJYCa4W07Q6mfrJza8yvA&usqp=CAU",
+                                stadiumImageUrl,
                             }}
                             style={{ height: 200, width: null, flex: 1 }}
                           />
@@ -275,10 +278,10 @@ export default class StadiumSearch extends Component {
                               <Icon
                                 name="map-marked-alt"
                                 type="FontAwesome5"
-                                style={{ color: HEADERBUTTONCOLOR }}
+                                style={{ color: "#2307A0" }}
                               />
-                              <Text2 style={{ color: HEADERBUTTONCOLOR }}>
-                                {stadium.venue_city}
+                              <Text2 style={{ color: "#2307A0" }}>
+                                {stadium.venue_hebrew_city}
                               </Text2>
                             </Button>
                           </Left>
@@ -287,9 +290,9 @@ export default class StadiumSearch extends Component {
                               <Icon
                                 name="chair"
                                 type="FontAwesome5"
-                                style={{ color: "#FF5254" }}
+                                style={{ color: "#2307A0" }}
                               />
-                              <Text2 style={{ color: "#FF5254" }}>
+                              <Text2 style={{ color: "#2307A0" }}>
                                 {stadium.venue_capacity} מקומות
                           </Text2>
                             </Button>
@@ -297,7 +300,7 @@ export default class StadiumSearch extends Component {
                           <Right style={{ marginRight: 15 }}>
                             <MaterialCommunityIcons
                               name="waze"
-                              style={{ fontSize: 30, color: "#31CBFD" }}
+                              style={{ fontSize: 30, color: "#2307A0" }}
                               onPress={() =>
                                 this.openwaze(stadium.longitude, stadium.latitude)
                               }
@@ -310,6 +313,26 @@ export default class StadiumSearch extends Component {
                 )}
             </Content>
           }
+          <AwesomeAlert
+            show={this.state.showError}
+            showProgress={false}
+            title="שְׁגִיאָה!"
+            message={this.state.error}
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            cancelText="No, cancel"
+            confirmText="לְהַמשִׁיך"
+            confirmButtonColor="#DD6B55"
+            onCancelPressed={() => {
+              this.setState({ showError: false })
+            }}
+            onConfirmPressed={() => {
+              this.setState({ showError: false })
+            }}
+          />
+
           <Modal visible={this.state.showmodal}>
             <Header style={{ backgroundColor: "white" }}>
               <Right style={{ flex: 1, backgroundColor: "white" }}>

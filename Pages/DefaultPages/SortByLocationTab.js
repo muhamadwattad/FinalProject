@@ -58,24 +58,23 @@ export default class SortByLocationTab extends Component {
   }
 
 
-  sortstadiums=async()=>{
-    if(this.state.stadiums==null||this.state.stadiums.length==0)
-    {
+  sortstadiums = async () => {
+    if (this.state.stadiums == null || this.state.stadiums.length == 0) {
       return;
     }
-    else{
-      let stadiums=this.state.stadiums.reverse();
-      this.setState({stadiums});
+    else {
+      let stadiums = this.state.stadiums.reverse();
+      this.setState({ stadiums });
     }
   }
 
 
   getUserLocation = async () => {
-    this.setState({loading:true})
+    this.setState({ loading: true })
     let { status } = await Location.requestPermissionsAsync();
     console.log(status);
     if (status != "granted") {
-      this.setState({ loading:false,dontload: true, errormsg: "NEED LOCATION PERMISSION" });
+      this.setState({ loading: false, dontload: true, errormsg: "NEED LOCATION PERMISSION" });
       return;
     }
     else {
@@ -94,7 +93,7 @@ export default class SortByLocationTab extends Component {
             reverseGC[0].city == undefined ||
             reverseGC[0].city.length == 0
           ) {
-            this.setState({loading:false, errormsg: "FAILED TO GET CITY", dontload: true });
+            this.setState({ loading: false, errormsg: "FAILED TO GET CITY", dontload: true });
             return;
           } else {
             console.log("TEST TEST");
@@ -102,12 +101,12 @@ export default class SortByLocationTab extends Component {
           }
         }
         else {
-          this.setState({ loading:false,errormsg: "FAILED TO GET LOCATION", dontload: true });
+          this.setState({ loading: false, errormsg: "FAILED TO GET LOCATION", dontload: true });
           return;
         }
       }
       catch (e) {
-        this.setState({loading:false,dontload: true, errormsg: "NEED LOCATION PERMISSION" });
+        this.setState({ loading: false, dontload: true, errormsg: "NEED LOCATION PERMISSION" });
         return;
       }
     }
@@ -207,16 +206,14 @@ export default class SortByLocationTab extends Component {
               <Text>{this.state.errormsg}</Text>
             </Body>
           </Header>
+          {
+            this.state.loading == true ? <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'smoke',  height: '100%' }} >
+              <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} />
+            </View> : <View></View>
+          }
           <Content>
 
-            <Spinner
-              visible={this.state.loading}
-              textContent="מקבל נתונים"
-              textStyle={{ color: HEADERBUTTONCOLOR }}
-              animation="fade"
-              overlayColor="grey"
-              size="large"
-            />
+           
             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: '50%' }}>
               <Text2 style={{ textAlign: 'center', alignItems: 'center', fontSize: 30, }}> כדי להשתמש בעמוד זה יש להפעיל את שירות מיקום</Text2>
               <Button bordered dark style={{ marginTop: 12, alignSelf: 'center' }} onPress={async () => {
@@ -260,7 +257,7 @@ export default class SortByLocationTab extends Component {
                   name="refresh"
                   size={30}
                   color={HEADERBUTTONCOLOR}
-                  onPress={()=>{
+                  onPress={() => {
                     this.getUserLocation();
                   }}
                 />
@@ -268,7 +265,7 @@ export default class SortByLocationTab extends Component {
             </Body>
             <Left>
               <Button transparent style={{ backgroundColor: "white", color: "blue", flex: 0.1 }}
-              onPress={this.sortstadiums}
+                onPress={this.sortstadiums}
               >
                 <MaterialCommunityIcons
                   name="sort"
@@ -279,15 +276,12 @@ export default class SortByLocationTab extends Component {
             </Left>
           </Header>
 
+          {
+            this.state.loading == true ? <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'smoke',  height: '100%' }} >
+              <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} />
+            </View> : <View></View>
+          }
           <Content >
-            <Spinner
-              visible={this.state.loading}
-              textContent="מקבל נתונים"
-              textStyle={{ color: HEADERBUTTONCOLOR }}
-              animation="fade"
-              overlayColor="grey"
-              size="large"
-            />
             <Modal visible={this.state.showmodal} animationType="slide" style={{ height: 150, width: '100%' }}>
               <Header style={{ backgroundColor: "white" }}>
                 <Right style={{ flex: 1 }}>

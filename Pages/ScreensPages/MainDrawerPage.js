@@ -1,4 +1,4 @@
-import { AsyncStorage, View } from "react-native";
+import { AsyncStorage, Modal, View } from "react-native";
 import {
   Body,
   Button,
@@ -27,10 +27,12 @@ import React, { Component } from "react";
 import Animated from "react-native-reanimated";
 import { DrawerActions } from "@react-navigation/native";
 import { HEADERBUTTONCOLOR } from "../URL";
+import HelpPage from "../DefaultPages/HelpPage";
 import HomePage from "../DefaultPages/HomePage";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import MoreStadium from "../DefaultPages/MoreStadium";
+import MoreStadium from "./MoreStadium";
 import { NavigationContainer } from "@react-navigation/native";
+import SettingsForm from './SettingsPageScreen'
 import StadiumSearch from "../DefaultPages/StadiumSearch";
 import TwoTeamsGame from "../DefaultPages/TwoTeamsGame";
 
@@ -110,6 +112,39 @@ export default class MainDrawerPage extends Component {
             title: "אצטדיון פלוס",
           }}
         />
+        
+        <Drawer.Screen
+          name="Settings"
+          title="הגדרות"
+          component={SettingsForm}
+          options={{
+            drawerIcon: ({ focused, color, size }) => (
+              <Icon
+                name="settings"
+                type="MaterialCommunityIcons"
+                style={{ fontSize: size, color: color }}
+              />
+              // <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
+            ),
+            title: "הגדרות",
+          }}
+        />
+        <Drawer.Screen
+          name="Help"
+          title="עזרה"
+          component={HelpPage}
+          options={{
+            drawerIcon: ({ focused, color, size }) => (
+              <Icon
+                name="help"
+                type="MaterialCommunityIcons"
+                style={{ fontSize: size, color: color }}
+              />
+              // <MaterialCommunityIcons name='home' style={{ fontSize: size, color: color }} />
+            ),
+            title: "עזרה",
+          }}
+        />
       </Drawer.Navigator>
     );
   }
@@ -127,6 +162,7 @@ export class Sidebar extends Component {
       background: "white",
       color: "#131313",
       image: "https://static.thenounproject.com/png/340719-200.png",
+      showmodal:false
     };
   }
 
@@ -136,6 +172,8 @@ export class Sidebar extends Component {
   logout = async () => {
     var activeuser = await AsyncStorage.getItem("activeuser");
     console.log(activeuser);
+   await this.props.navigation.dispatch(DrawerActions.closeDrawer());
+    this.setState({showmodal:true});
   };
 
   getData = async () => {
@@ -187,6 +225,14 @@ export class Sidebar extends Component {
           </Right>
         </Header>
         <Content>
+          <Modal visible={this.state.showmodal}>
+            <Button onPress={() =>this.setState({showmodal:false})}>
+              <Text>CLOSE</Text>
+            </Button>
+            <View style={{flex:1}}>
+              <Text> Test</Text>
+            </View>
+          </Modal>
           <ListItem
             thumbnail
             style={{ backgroundColor: this.state.background,height:135,borderBottomWidth:1,borderBottomColor:'black' }}

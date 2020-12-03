@@ -64,7 +64,7 @@ export default class GamesByStadium extends Component {
   }
   async UNSAFE_componentWillMount() {
     //SAVING STADIUM INTO STATE FROM PARENT
-    this.setState({ stadium: this.props.stadium }, () => console.log(this.state.stadium));
+    this.setState({ stadium: this.props.stadium });
     //GETTING GAMES THAT HAPPEND OR WILL HAPPEN ON THIS STADIUM
     let url = APILINK + "Getgamesbystadium/" + this.props.stadium.venue_name;
 

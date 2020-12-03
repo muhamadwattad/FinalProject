@@ -7,9 +7,9 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import { Dimensions } from 'react-native';
 import { HEADERBUTTONCOLOR } from '../URL';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import SortByDateTab from './SortByDateTab';
-import SortByLocationTab from './SortByLocationTab';
-import SortByTeamsTab from './SortByTeamsTab';
+import SortByDateTab from '../DefaultPages/SortByDateTab';
+import SortByLocationTab from '../DefaultPages/SortByLocationTab';
+import SortByTeamsTab from '../DefaultPages/SortByTeamsTab';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import moment from 'moment'
 
@@ -18,7 +18,7 @@ export default class MoreStadium extends Component {
   render() {
     return (
       <Tab.Navigator>
-        <Tab.Screen name="Teams" component={SortByTeamsTab} 
+        <Tab.Screen name="קבוצות" component={SortByTeamsTab} 
         options={{
           tabBarIcon:({color,size})=>(
             <Icon name="team" type="AntDesign" />
@@ -29,12 +29,12 @@ export default class MoreStadium extends Component {
         
         
         />
-        <Tab.Screen name="Time" component={SortByDateTab}options={{
+        <Tab.Screen name="משחקים" component={SortByDateTab}options={{
           tabBarIcon:({color,size})=>(
             <Icon name="time" type="Ionicons" />
           )
         }} />
-        <Tab.Screen name="Location" component={SortByLocationTab} 
+        <Tab.Screen name="מיקום" component={SortByLocationTab} 
         
         options={{
           tabBarIcon:({color,size})=>(
