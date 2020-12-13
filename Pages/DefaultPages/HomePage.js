@@ -9,6 +9,7 @@ import { Dimensions } from 'react-native';
 import GameInfo from "./GameInfo";
 import { HEADERBUTTONCOLOR } from '../URL';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import TeamsListPage from './TeamsListPage'
 import moment from 'moment'
 
 //DAYS OF THE WEEK IN HEBREW AND ENGLISH
@@ -44,372 +45,339 @@ export default class HomePage extends Component {
       teams: [],
       showError: false,
       openmodal: false,
-      favoriteteams: []
+      teamlistmodal: false
+
 
     }
 
   }
-  favoriteteams = async () => {
-    //GETTING USER's FAVORITE TEAMS
 
-    var user = JSON.parse(await AsyncStorage.getItem("activeuser"));
-
-    var url = APILINK + "getuserteams/" + user.email + "/";
-    await fetch(url).then((resp) => {
-      return resp.json();
-    }).then(async (data) => {
-      if ('Message' in data) {
-        // NO TEAMS
-
-      }
-      else {
-        this.setState({ favoriteteams: data });
-      }
-
-    })
+  HideTeamListModal=()=>{
+    this.setState({teamlistmodal:false});
   }
   render() {
-    if (this.state.favoriteteams.length == 0) {
-      return (
-        <Container >
-          <Header style={{ backgroundColor: 'white' }}>
 
-            <Right style={{ flex: 1 }} >
+    return (
+      <Container >
+        <Header style={{ backgroundColor: 'white' }}>
 
-              <Button onPress={() => {
-                this.props.navigation.toggleDrawer();
+          <Right style={{ flex: 1 }} >
 
-
-              }} style={{ backgroundColor: 'white', color: 'blue', flex: 1 }} transparent >
-                {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
-                <MaterialCommunityIcons name="menu" size={30} color={HEADERBUTTONCOLOR} />
-              </Button>
-            </Right>
+            <Button onPress={() => {
+              this.props.navigation.toggleDrawer();
 
 
+            }} style={{ backgroundColor: 'white', color: 'blue', flex: 1 }} transparent >
+              {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
+              <MaterialCommunityIcons name="menu" size={30} color={HEADERBUTTONCOLOR} />
+            </Button>
+          </Right>
 
 
 
-          </Header>
 
-          <Modal
-            transparent={true}
 
-            animationType="fade"
-            visible={this.state.showCalendar}
+        </Header>
+
+        <Modal
+          transparent={true}
+
+          animationType="fade"
+          visible={this.state.showCalendar}
+        >
+          <Container >
+            <Header style={{ backgroundColor: 'white' }}>
+
+              <Right style={{ flex: 1 }} >
+
+                <Button onPress={() => {
+                  this.setState({ showCalendar: false })
+
+                }} style={{ backgroundColor: 'white', color: 'blue', flex: 1 }} transparent >
+
+                  <MaterialCommunityIcons name="close" size={30} color={HEADERBUTTONCOLOR} />
+                </Button>
+              </Right>
+
+            </Header>
+            <Content style={{ marginTop: 12, height: 150 }}>
+              <Calendar
+
+
+                // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
+                minDate={'2020-08-30'}
+                // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
+
+                // Handler which gets executed on day press. Default = undefined
+                onDayPress={(day) => {
+
+
+                  var date = "" + day.day + "/" + day.month;
+                  this.SaveGames(date);
+
+
+                }}
+
+
+                // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
+                monthFormat={'MMM yyyy '}
+                // Handler which gets executed when visible month changes in calendar. Default = undefined
+
+
+                // Do not show days of other months in month page. Default = false
+                hideExtraDays={true}
+
+                // Handler which gets executed when press arrow icon left. It receive a callback can go back month
+                onPressArrowLeft={subtractMonth => subtractMonth()}
+                // Handler which gets executed when press arrow icon right. It receive a callback can go next month
+                onPressArrowRight={addMonth => addMonth()}
+
+                // Disable all touch events for disabled days. can be override with disableTouchEvent in markedDates
+                disableAllTouchEventsForDisabledDays={true}
+                // Replace default month and year title with custom one. the function receive a date as parameter.
+
+                // Enable the option to swipe between months. Default = false
+                enableSwipeMonths={false}
+                theme={{
+                  backgroundColor: '#ffffff',
+                  calendarBackground: '#ffffff',
+                  textSectionTitleColor: '#b6c1cd',
+                  textSectionTitleDisabledColor: '#d9e1e8',
+                  selectedDayBackgroundColor: '#00adf5',
+                  selectedDayTextColor: '#ffffff',
+                  todayTextColor: '#00adf5',
+                  dayTextColor: '#2d4150',
+                  textDisabledColor: '#d9e1e8',
+                  dotColor: '#00adf5',
+                  selectedDotColor: '#ffffff',
+                  arrowColor: 'green',
+                  disabledArrowColor: '#d9e1e8',
+                  monthTextColor: HEADERBUTTONCOLOR,
+                  indicatorColor: 'blue',
+                  textDayFontFamily: 'monospace',
+                  textMonthFontFamily: 'monospace',
+                  textDayHeaderFontFamily: 'monospace',
+                  textDayFontWeight: '300',
+                  textMonthFontWeight: 'bold',
+                  textDayHeaderFontWeight: '300',
+                  textDayFontSize: 16,
+                  textMonthFontSize: 16,
+                  textDayHeaderFontSize: 16
+                }}
+              />
+            </Content>
+          </Container>
+
+        </Modal>
+
+        {/*DATES VIEW */}
+        <View style={{
+          width: '100%', height: windowHeight / 13, borderColor: 'black', borderBottomWidth: 1, borderTopWidth: 1, borderRightWidth: 1, borderLeftWidth: 1,
+          flexDirection: "row", backgroundColor: 'white'
+        }}>
+          <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }} onPress={async () => {
+
+
+
+            //SHOWING THE TEAMLIST MODAL
+            this.setState({ teamlistmodal: true });
+          }}>
+            <Icon name="sports-club" type="Entypo" style={{ fontSize: 30, color: HEADERBUTTONCOLOR, margin: 8 }} />
+
+          </TouchableOpacity>
+          <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
+            onPress={() => {
+              this.SaveGames(this.state._2daysagostring)
+            }}
           >
-            <Container >
-              <Header style={{ backgroundColor: 'white' }}>
+            <Text style={{ fontWeight: 'bold', textAlign: 'center' }} key={1}>{arrayOfWeekdays2[this.state._2daysago]}</Text>
+            <Text style={styles.dateString} key={2}>{this.state._2daysagostring}</Text>
 
-                <Right style={{ flex: 1 }} >
+          </TouchableOpacity >
+          <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
+            onPress={() => {
+              this.SaveGames(this.state.yestrdaystring)
+            }}
+          >
+            <Text key={3} style={{ fontWeight: 'bold', textAlign: 'center' }}>{arrayOfWeekdays2[this.state.yestrday]}</Text>
 
-                  <Button onPress={() => {
-                    this.setState({ showCalendar: false })
+            <Text key={4} style={styles.dateString}>{this.state.yestrdaystring}</Text>
+          </TouchableOpacity >
 
-                  }} style={{ backgroundColor: 'white', color: 'blue', flex: 1 }} transparent >
+          <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
+            onPress={() => {
+              this.SaveGames(this.state.todaystring);
+            }}
+          >
+            <Text key={5} style={{ fontWeight: 'bold', textAlign: 'center' }}>היום</Text>
+            <Text key={6} style={styles.dateString}>{this.state.todaystring}</Text>
+          </TouchableOpacity >
 
-                    <MaterialCommunityIcons name="close" size={30} color={HEADERBUTTONCOLOR} />
-                  </Button>
-                </Right>
+          <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
+            onPress={() => {
+              this.SaveGames(this.state.tomorrowstring);
+            }}
+          >
+            <Text key={7} style={{ fontWeight: 'bold', textAlign: 'center' }}>{arrayOfWeekdays2[this.state.tmr]}</Text>
+            <Text key={8} style={styles.dateString}>{this.state.tomorrowstring}</Text>
+          </TouchableOpacity >
+          <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }} onPress={() => {
+            this.SaveGames(this.state._in2daysstring);
+          }}>
+            <Text key={9} style={{ fontWeight: 'bold', textAlign: 'center' }}>{arrayOfWeekdays2[this.state.in2days]}</Text>
+            <Text key={10} style={styles.dateString}>{this.state._in2daysstring}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
 
-              </Header>
-              <Content style={{ marginTop: 12, height: 150 }}>
-                <Calendar
+            onPress={() => {
+              this.setState({ showCalendar: true })
+            }}
+          >
+            <MaterialCommunityIcons name="calendar" size={30} style={{ margin: 8 }} />
+          </TouchableOpacity>
+        </View>
 
-
-                  // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-                  minDate={'2020-08-30'}
-                  // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-
-                  // Handler which gets executed on day press. Default = undefined
-                  onDayPress={(day) => {
-
-
-                    var date = "" + day.day + "/" + day.month;
-                    this.SaveGames(date);
-
-
+        <Content scrollEnabled={true}>
+          {/* GAME INFO MODAL */}
+          <Modal visible={this.state.openmodal}>
+            <Header style={{ backgroundColor: "white" }}>
+              <Right style={{ flex: 1 }}>
+                <Button
+                  onPress={() => {
+                    this.setState({ openmodal: false });
                   }}
+                  style={{ backgroundColor: "white", color: "blue", flex: 1 }}
+                  transparent
+                >
+                  {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
+                  <MaterialCommunityIcons
+                    name="close"
+                    size={30}
+                    color={HEADERBUTTONCOLOR}
+                  />
+                </Button>
+              </Right>
 
+            </Header>
 
-                  // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-                  monthFormat={'MMM yyyy '}
-                  // Handler which gets executed when visible month changes in calendar. Default = undefined
-
-
-                  // Do not show days of other months in month page. Default = false
-                  hideExtraDays={true}
-
-                  // Handler which gets executed when press arrow icon left. It receive a callback can go back month
-                  onPressArrowLeft={subtractMonth => subtractMonth()}
-                  // Handler which gets executed when press arrow icon right. It receive a callback can go next month
-                  onPressArrowRight={addMonth => addMonth()}
-
-                  // Disable all touch events for disabled days. can be override with disableTouchEvent in markedDates
-                  disableAllTouchEventsForDisabledDays={true}
-                  // Replace default month and year title with custom one. the function receive a date as parameter.
-
-                  // Enable the option to swipe between months. Default = false
-                  enableSwipeMonths={false}
-                  theme={{
-                    backgroundColor: '#ffffff',
-                    calendarBackground: '#ffffff',
-                    textSectionTitleColor: '#b6c1cd',
-                    textSectionTitleDisabledColor: '#d9e1e8',
-                    selectedDayBackgroundColor: '#00adf5',
-                    selectedDayTextColor: '#ffffff',
-                    todayTextColor: '#00adf5',
-                    dayTextColor: '#2d4150',
-                    textDisabledColor: '#d9e1e8',
-                    dotColor: '#00adf5',
-                    selectedDotColor: '#ffffff',
-                    arrowColor: 'green',
-                    disabledArrowColor: '#d9e1e8',
-                    monthTextColor: HEADERBUTTONCOLOR,
-                    indicatorColor: 'blue',
-                    textDayFontFamily: 'monospace',
-                    textMonthFontFamily: 'monospace',
-                    textDayHeaderFontFamily: 'monospace',
-                    textDayFontWeight: '300',
-                    textMonthFontWeight: 'bold',
-                    textDayHeaderFontWeight: '300',
-                    textDayFontSize: 16,
-                    textMonthFontSize: 16,
-                    textDayHeaderFontSize: 16
-                  }}
-                />
-              </Content>
-            </Container>
-
+            <GameInfo
+              game={this.state.gameinfo}
+              homeTeam={this.state.homeTeam}
+              awayTeam={this.state.awayTeam}
+            />
           </Modal>
 
-          {/*DATES VIEW */}
-          <View style={{
-            width: '100%', height: windowHeight / 13, borderColor: 'black', borderBottomWidth: 1, borderTopWidth: 1, borderRightWidth: 1, borderLeftWidth: 1,
-            flexDirection: "row", backgroundColor: 'white'
-          }}>
-            <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }} onPress={this.favoriteteams}>
-              <Icon name="sports-club" type="Entypo" style={{ fontSize: 30, color: 'black', margin: 8 }} />
+          {/* POP UP FOR ERROR THAT NO GAMES WERE FOUND*/}
+          <AwesomeAlert
+            show={this.state.showError}
+            showProgress={false}
+            title="אין משחקים"
+            message="לא נמצאו משחקים בתאריך זה"
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            cancelText="No, cancel"
+            confirmText="לְהַמשִׁיך"
+            confirmButtonColor="#DD6B55"
+            onCancelPressed={() => {
+              this.setState({ showError: false })
+            }}
+            onConfirmPressed={() => {
+              this.setState({ showError: false })
+            }}
+          />
 
-            </TouchableOpacity>
-            <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
-              onPress={() => {
-                this.SaveGames(this.state._2daysagostring)
-              }}
-            >
-              <Text style={{ fontWeight: 'bold', textAlign: 'center' }} key={1}>{arrayOfWeekdays2[this.state._2daysago]}</Text>
-              <Text style={styles.dateString} key={2}>{this.state._2daysagostring}</Text>
+          {/* POP UP FOR THE TEAMS LIST  */}
+          <Modal visible={this.state.teamlistmodal} animationType="slide">
+            <TeamsListPage HideModal={this.HideTeamListModal} />
+          </Modal>
+          {/* GAMES LIST */}
+          {this.state.games == "No Games Found" || this.state.games.length == 0 ?
 
-            </TouchableOpacity >
-            <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
-              onPress={() => {
-                this.SaveGames(this.state.yestrdaystring)
-              }}
-            >
-              <Text key={3} style={{ fontWeight: 'bold', textAlign: 'center' }}>{arrayOfWeekdays2[this.state.yestrday]}</Text>
-
-              <Text key={4} style={styles.dateString}>{this.state.yestrdaystring}</Text>
-            </TouchableOpacity >
-
-            <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
-              onPress={() => {
-                this.SaveGames(this.state.todaystring);
-              }}
-            >
-              <Text key={5} style={{ fontWeight: 'bold', textAlign: 'center' }}>היום</Text>
-              <Text key={6} style={styles.dateString}>{this.state.todaystring}</Text>
-            </TouchableOpacity >
-
-            <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
-              onPress={() => {
-                this.SaveGames(this.state.tomorrowstring);
-              }}
-            >
-              <Text key={7} style={{ fontWeight: 'bold', textAlign: 'center' }}>{arrayOfWeekdays2[this.state.tmr]}</Text>
-              <Text key={8} style={styles.dateString}>{this.state.tomorrowstring}</Text>
-            </TouchableOpacity >
-            <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }} onPress={() => {
-              this.SaveGames(this.state._in2daysstring);
-            }}>
-              <Text key={9} style={{ fontWeight: 'bold', textAlign: 'center' }}>{arrayOfWeekdays2[this.state.in2days]}</Text>
-              <Text key={10} style={styles.dateString}>{this.state._in2daysstring}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{ width: '14%', paddingTop: 4, textAlign: 'center', }}
-
-              onPress={() => {
-                this.setState({ showCalendar: true })
-              }}
-            >
-              <MaterialCommunityIcons name="calendar" size={30} style={{ margin: 8 }} />
-            </TouchableOpacity>
-          </View>
-
-          <Content scrollEnabled={true}>
-            {/* GAME INFO MODAL */}
-            <Modal visible={this.state.openmodal}>
-              <Header style={{ backgroundColor: "white" }}>
-                <Right style={{ flex: 1 }}>
-                  <Button
-                    onPress={() => {
-                      this.setState({ openmodal: false });
-                    }}
-                    style={{ backgroundColor: "white", color: "blue", flex: 1 }}
-                    transparent
-                  >
-                    {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
-                    <MaterialCommunityIcons
-                      name="close"
-                      size={30}
-                      color={HEADERBUTTONCOLOR}
-                    />
-                  </Button>
-                </Right>
-
-              </Header>
-
-              <GameInfo
-                game={this.state.gameinfo}
-                homeTeam={this.state.homeTeam}
-                awayTeam={this.state.awayTeam}
-              />
-            </Modal>
-
-            {/* POP UP FOR ERROR THAT NO GAMES WERE FOUND*/}
-            <AwesomeAlert
-              show={this.state.showError}
-              showProgress={false}
-              title="אין משחקים"
-              message="לא נמצאו משחקים בתאריך זה"
-              closeOnTouchOutside={true}
-              closeOnHardwareBackPress={false}
-              showCancelButton={false}
-              showConfirmButton={true}
-              cancelText="No, cancel"
-              confirmText="לְהַמשִׁיך"
-              confirmButtonColor="#DD6B55"
-              onCancelPressed={() => {
-                this.setState({ showError: false })
-              }}
-              onConfirmPressed={() => {
-                this.setState({ showError: false })
-              }}
-            />
-            {/* GAMES LIST */}
-            {this.state.games == "No Games Found" || this.state.games.length == 0 ?
-
-              // IF THERE IS NO GAMES IN THAT DATE
-              <View>
-                <Text style={{ textAlign: 'center', alignItems: 'center', fontSize: 30, marginTop: '50%' }} >
-                  לא נמצאו משחקים בתאריך הזה.
+            // IF THERE IS NO GAMES IN THAT DATE
+            <View>
+              <Text style={{ textAlign: 'center', alignItems: 'center', fontSize: 30, marginTop: '50%' }} >
+                לא נמצאו משחקים בתאריך הזה.
           </Text>
-                <Text2 note style={{ textAlign: 'center', alignItems: 'center', marginTop: 10 }} >תבחר תאריך אחר על ידי לחיצה על תאריך או על ידיד בחירת תאריך</Text2>
-              </View>
+              <Text2 note style={{ textAlign: 'center', alignItems: 'center', marginTop: 10 }} >תבחר תאריך אחר על ידי לחיצה על תאריך או על ידיד בחירת תאריך</Text2>
+            </View>
 
-              :
-              //IF THERE IS GAMES IN THAT DATE
-              <List scrollEnabled={true} onScroll={(e) => {
+            :
+            //IF THERE IS GAMES IN THAT DATE
+            <List scrollEnabled={true} onScroll={(e) => {
 
-              }}>
-                {
-                  this.state.games.map((game, index) => {
+            }}>
+              {
+                this.state.games.map((game, index) => {
+                  var homeTeam = this.state.teams.find(team => team.team_id == game.homeTeamCode);
+                  var awayTeam = this.state.teams.find(team => team.team_id == game.awayTeamCode);
+                  var matchdate = game.event_date.split(" ")[1];
 
-                    while (this.state.teams.length == 0 || this.state.teams == null) {
-                      //get teams again
-                    }
+                  matchdate = matchdate.slice(0, -3);
+                  var matchdate2 = game.event_date.split(" ")[0];
+                  var monthtoEdit = matchdate2[0] + "" + matchdate2[1];
+                  var daytoEdit = matchdate2[3] + "" + matchdate2[4];
+                  var yeartoEdit = matchdate2.slice(-4);
+                  matchdate2 = daytoEdit + "/" + monthtoEdit + "/" + yeartoEdit;
 
-                    var homeTeam = this.state.teams.find(team => team.team_id == game.homeTeamCode);
-                    var awayTeam = this.state.teams.find(team => team.team_id == game.awayTeamCode);
-                    var matchdate = game.event_date.split(" ")[1];
+                  return (
+                    <ListItem key={index.toString()}>
 
-                    matchdate = matchdate.slice(0, -3);
-                    var matchdate2 = game.event_date.split(" ")[0];
-                    var monthtoEdit = matchdate2[0] + "" + matchdate2[1];
-                    var daytoEdit = matchdate2[3] + "" + matchdate2[4];
-                    var yeartoEdit = matchdate2.slice(-4);
-                    matchdate2 = daytoEdit + "/" + monthtoEdit + "/" + yeartoEdit;
+                      {/*HOME TEAM*/}
+                      <View
+                        style={{
+                          justifyContent: "space-between",
+                          flexDirection: "row",
+                          width: "100%",
+                          display: "flex",
+                        }}
+                      >
+                        <View style={{ alignItems: "flex-start" }}>
+                          <Thumbnail source={{ uri: homeTeam.logo }} />
+                        </View>
+                        <View style={{ borderColor: "black" }}>
+                          <Text style={{ textAlign: "center" }}>
+                            {" "}
+                            {matchdate}
+                          </Text>
 
-                    return (
-                      <ListItem key={index.toString()}>
-
-                        {/*HOME TEAM*/}
-                        <View
-                          style={{
-                            justifyContent: "space-between",
-                            flexDirection: "row",
-                            width: "100%",
-                            display: "flex",
-                          }}
-                        >
-                          <View style={{ alignItems: "flex-start" }}>
-                            <Thumbnail source={{ uri: homeTeam.logo }} />
-                          </View>
-                          <View style={{ borderColor: "black" }}>
-                            <Text style={{ textAlign: "center" }}>
-                              {" "}
-                              {matchdate}
-                            </Text>
-
-                            <Text2 note>{matchdate2}</Text2>
-                            <Text2
-                              note
-                              style={{ color: "#228B22" }}
-                              onPress={() => {
-                                this.setState({
-                                  openmodal: true,
-                                  gameinfo: game,
-                                  homeTeam,
-                                  awayTeam,
-                                });
-                              }}
-                            >
-                              {" "}
+                          <Text2 note>{matchdate2}</Text2>
+                          <Text2
+                            note
+                            style={{ color: "#228B22" }}
+                            onPress={() => {
+                              this.setState({
+                                openmodal: true,
+                                gameinfo: game,
+                                homeTeam,
+                                awayTeam,
+                              });
+                            }}
+                          >
+                            {" "}
                           צפיה בפרטי המשחק
                         </Text2>
-                          </View>
-                          {/*AWAY TEAM*/}
-                          <View style={{ alignItems: "flex-end" }}>
-                            <Thumbnail source={{ uri: awayTeam.logo }} />
-                          </View>
                         </View>
+                        {/*AWAY TEAM*/}
+                        <View style={{ alignItems: "flex-end" }}>
+                          <Thumbnail source={{ uri: awayTeam.logo }} />
+                        </View>
+                      </View>
 
-                      </ListItem>
-                    )
-                  })
-                }
-              </List>
-            }
+                    </ListItem>
+                  )
+                })
+              }
+            </List>
+          }
 
-          </Content>
+        </Content>
 
-        </Container>
-      )
-    }
-    else {
-      return (
-        <Container >
-          <Header style={{ backgroundColor: 'white' }}>
-
-            <Right style={{ flex: 1 }} >
-
-              <Button onPress={() => {
-                this.props.navigation.toggleDrawer();
-
-
-              }} style={{ backgroundColor: 'white', color: 'blue', flex: 1 }} transparent >
-                {/* <Icon type="SimpleLineIcons" name="menu" size={30} color={HEADERBUTTONCOLOR} /> */}
-                <MaterialCommunityIcons name="menu" size={30} color={HEADERBUTTONCOLOR} />
-              </Button>
-            </Right>
-
-
-
-
-
-          </Header>
-        </Container>
-      )
-    }
+      </Container>
+    )
   }
+
 
   async componentDidMount() {
     //getting teams

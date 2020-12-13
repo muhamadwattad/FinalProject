@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "final-project",
-    "slug": "final-project",
+    "name": "u-stadium",
+    "slug": "u-stadium",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,10 +17,17 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "1"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "android": {
+      "package": "com.mw.ustadium",
+      "versionCode": 1,
+      "permissions": []
+    },
+    "description": ""
   }
 }

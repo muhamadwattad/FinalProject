@@ -1,3 +1,4 @@
+import { APILINK, HEADERBUTTONCOLOR, RANDOMIMAGEURL } from "../URL";
 import { AsyncStorage, Dimensions, Image, Text, View } from "react-native";
 import {
   Body,
@@ -20,15 +21,15 @@ import {
 } from "native-base";
 import React, { Component } from "react";
 
-import { HEADERBUTTONCOLOR } from "../URL";
-
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 export default class GameInfo extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      stadiums: []
+      stadiums: [],
+      stadium: null,
+      stadiumImg:RANDOMIMAGEURL
     };
   }
   async UNSAFE_componentWillMount() {
@@ -64,20 +65,20 @@ export default class GameInfo extends Component {
         this.setState({ gameStatus, color })
       }
     );
-  
+
 
   }
   async componentDidMount() {
     //CHANGING DATE OF GAME 
     var matchdate = this.state.game.event_date.split(" ")[1];
-    var matchdate2 =this.state.game.event_date.split(" ")[0];
-    matchdate=matchdate.slice(0,-3);
+    var matchdate2 = this.state.game.event_date.split(" ")[0];
+    matchdate = matchdate.slice(0, -3);
     var monthtoEdit = matchdate2[0] + "" + matchdate2[1];
     var daytoEdit = matchdate2[3] + "" + matchdate2[4];
     var yeartoEdit = matchdate2.slice(-4);
     matchdate2 = daytoEdit + "/" + monthtoEdit + "/" + yeartoEdit;
-    this.setState({matchdate:matchdate2+" "+matchdate});
-    
+    this.setState({ matchdate: matchdate2 + " " + matchdate });
+
     var stadiums = await JSON.parse(await AsyncStorage.getItem("stadiums"));
     if (stadiums == null || stadiums == undefined) {
       //GETTING GAMES
@@ -93,7 +94,22 @@ export default class GameInfo extends Component {
       })
     }
     else {
-      this.setState({ stadiums })
+      this.setState({ stadiums }, () => {
+        //getting the stadium of this game
+        let stadiumname = this.state.game.venue;
+        let obj = this.state.stadiums.find(x => x.venue_name == stadiumname);
+        console.log(obj)
+        if (obj != null)
+          this.setState({ stadium: obj},()=>{
+            //getting the image of the stadium
+            var stadiumName = this.state.stadium.venue_name;
+
+            stadiumName = stadiumName.replace(/ /g, '');
+            var url = APILINK + "stadiumimages/" + stadiumName + ".jpg"
+            this.setState({stadiumImg:url})
+          });
+
+      })
     }
 
 
@@ -163,12 +179,57 @@ export default class GameInfo extends Component {
             <Text style={{ width: '20%', textAlign: 'center', fontSize: 20 }}>{this.state.game.homeScore}</Text>
             <View style={{ width: '60%', }}>
               <Text style={{ textAlign: 'center', color: this.state.color, fontSize: 18 }}>  {this.state.gameStatus}</Text>
-              <Text2 style={{textAlign:'center',fontSize:15,marginTop:2}} note>{this.state.matchdate}</Text2>
+              <Text2 style={{ textAlign: 'center', fontSize: 15, marginTop: 2 }} note>{this.state.matchdate}</Text2>
             </View>
             <Text2 style={{ width: '20%', textAlign: 'center', fontSize: 20 }}>{this.state.game.awayScore}</Text2>
 
           </View>
-          <View style={{ width: '100%', height: '90%' }}></View>
+
+          <View style={{
+            width: '100%', height: '90%', justifyContent: "space-between",
+            flexDirection: "row", backgroundColor: 'smoke'
+          }}>
+
+
+
+
+            {this.state.stadium != null ?
+              <View style={{ height: '100%', width: '55%' }}>
+
+                <Card style={{marginTop:'25%'}}>
+                  <CardItem header bordered>
+                    <Text2>{this.state.stadium.venue_hebrew_name}</Text2>
+
+                  </CardItem>
+                  <CardItem header bordered>
+                    <Text2>{this.state.stadium.venue_hebrew_city}</Text2>
+                  </CardItem>
+                  <CardItem header bordered>
+                    <Text2>{this.state.stadium.venue_name}</Text2>
+                  </CardItem>
+                  <CardItem header bordered>
+                    <Text2>{this.state.stadium.venue_city}</Text2>
+                  </CardItem>
+
+                </Card>
+
+              </View>
+              : <View></View>}
+
+            <View style={{ height: '100%', width: '45%', backgroundColor: 'smoke' }}>
+              <View style={{ margin: 15, height: '70%', }}>
+
+                <Image source={{ uri: this.state.stadiumImg }} style={{ width: '100%', height: '100%' }} />
+              </View>
+
+            </View>
+
+
+
+
+
+
+          </View>
 
 
         </View>

@@ -1,4 +1,4 @@
-import { AsyncStorage, Image, Modal, Text, View } from 'react-native'
+import { Alert, AsyncStorage, Image, Modal, Text, View } from 'react-native'
 import { Body, Button, Container, Content, Header, Icon, Left, List, ListItem, Picker, Right, Segment, Text as Text2, Thumbnail } from 'native-base';
 import React, { Component } from 'react'
 
@@ -21,7 +21,7 @@ export default class SortByTeamsTab extends Component {
     }
   }
   async componentDidMount() {
-    this.setState({loading:true})
+    this.setState({ loading: true })
     //getting teams from AsyncStorage or from api
     let teams = await AsyncStorage.getItem("teams");
     if (teams == null) {
@@ -51,19 +51,19 @@ export default class SortByTeamsTab extends Component {
           this.setState({ dontload: true, errormsg: "No Stadiums" });
         }
         else {
-          this.setState({ stadiums: data,loading:false });
+          this.setState({ stadiums: data, loading: false });
         }
       })
     }
     else {
       stadiums = await JSON.parse(stadiums);
-      this.setState({ stadiums,loading:false });
+      this.setState({ stadiums, loading: false });
     }
 
   }
   sortteams = async () => {
     //SORTING TEAMS BY THEIR LEAGUES LEAGUE 1 => FIRST DIV 2=> SECOND DIV
-    this.setState({loading:true});
+    this.setState({ loading: true });
     let teams;
     if (this.state.teams[0].team_league == 1) {
       teams = this.state.teams.sort((a, b) => (a.team_league > b.team_league) ? 1 : -1);
@@ -71,7 +71,7 @@ export default class SortByTeamsTab extends Component {
     else {
       teams = this.state.teams.sort((a, b) => (a.team_league < b.team_league) ? 1 : -1);
     }
-    this.setState({ teams,loading:false });
+    this.setState({ teams, loading: false });
   }
   changeValues = async (value) => {
     this.setState({ selected: value });
@@ -130,12 +130,22 @@ export default class SortByTeamsTab extends Component {
               <Picker.Item label="ליגה לאומית" value="2" />
 
             </Picker>
+            <Left>
+              <Button onPress={() => {
+               
+
+
+              }} transparent>
+
+                <MaterialCommunityIcons name="table-search" size={25} color={HEADERBUTTONCOLOR} />
+              </Button>
+            </Left>
 
           </Header>
           {
-            this.state.loading==true?<View style={{justifyContent:'center',  alignItems: 'center',backgroundColor:'smoke',borderWidth:1,height:'100%'}} >
-            <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} /><Text2>מקבל נתונים...</Text2>
-          </View>:<View></View>
+            this.state.loading == true ? <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'smoke', borderWidth: 1, height: '100%' }} >
+              <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} /><Text2>מקבל נתונים...</Text2>
+            </View> : <View></View>
           }
           <Content>
             {this.state.teams.length == 0 || this.state.teams == null || this.state.stadiums == null || this.state.stadiums.length == 0 ? <Text>NO TEAMS</Text> :

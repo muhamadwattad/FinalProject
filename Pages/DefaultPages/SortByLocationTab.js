@@ -208,7 +208,7 @@ export default class SortByLocationTab extends Component {
           </Header>
           {
             this.state.loading == true ? <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'smoke',  height: '100%' }} >
-              <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} />
+              <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} /><Text2>מקבל נתונים...</Text2>
             </View> : <View></View>
           }
           <Content>
@@ -233,7 +233,7 @@ export default class SortByLocationTab extends Component {
       return (
         <Container>
           <Header style={{ backgroundColor: "white" }}>
-            <Right style={{ flex: 1 }}>
+            <Right style={{ flex: 1}}>
               <Button
                 onPress={() => {
                   this.props.navigation.toggleDrawer();
@@ -251,8 +251,8 @@ export default class SortByLocationTab extends Component {
 
 
             </Right>
-            <Body style={{ borderWidth: 1, alignSelf: 'center' }}>
-              <Button transparent style={{ backgroundColor: "white", color: "blue" }}>
+            <Body style={{flex:1, }}>
+              <Button transparent style={{ backgroundColor: "white", color: "blue",}}>
                 <MaterialCommunityIcons
                   name="refresh"
                   size={30}
@@ -278,7 +278,7 @@ export default class SortByLocationTab extends Component {
 
           {
             this.state.loading == true ? <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'smoke',  height: '100%' }} >
-              <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} />
+              <Image source={require('../../assets/loading.gif')} style={{ width: 100, height: 100 }} /><Text>מקבל נתונים...</Text>
             </View> : <View></View>
           }
           <Content >
@@ -313,11 +313,14 @@ export default class SortByLocationTab extends Component {
               >
                 {
                   this.state.stadiums.map((stadium, index) => {
+                    var stadiumImageUrl = stadium.venue_name;
+                    stadiumImageUrl = stadiumImageUrl.replace(/ /g, '');
+                    stadiumImageUrl = APILINK + "stadiumimages/" + stadiumImageUrl + ".jpg"
 
                     return (
                       <ListItem thumbnail style={{ margin: 3 }} key={index.toString()}>
                         <Left>
-                          <Thumbnail square source={{ uri: RANDOMIMAGEURL }} />
+                          <Thumbnail square source={{ uri: stadiumImageUrl }} />
                         </Left>
                         <Body>
                           <Text2>{stadium.venue_hebrew_name}</Text2>

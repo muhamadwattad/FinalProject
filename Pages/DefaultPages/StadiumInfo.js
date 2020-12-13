@@ -105,9 +105,15 @@ export default class StadiumInfo extends Component {
             <CardItem bordered header>
               <View style={{ width: '100%', flexDirection: 'row' }}>
                 <View style={{ width: '50%', justifyContent: 'flex-start' }}>
-                  <Button transparent onPress={this.showmap}>
-                    <Icon name="map" type="FontAwesome5" style={{ color: 'red' }} />
-                    <Text2 style={{ color: 'red' }}>Map</Text2>
+                  <Button transparent onPress={()=>{
+                    var url="https://www.google.com/search?q=";
+                    var stadium_name=this.state.stadium.venue_hebrew_name
+                    stadium_name=stadium_name.replace(/ /g, '+');
+                    
+                    Linking.openURL(url+stadium_name);
+                  }}>
+                    <Icon name="google" type="AntDesign" style={{ color: 'red' }} />
+                    <Text2 style={{ color: 'red' }}>Google</Text2>
                   </Button>
                 </View>
                 <View style={{ width: '50%', justifyContent: 'flex-end', borderLeftWidth: 2 }}>

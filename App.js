@@ -83,6 +83,7 @@ export default class App extends React.Component {
     }
   }
   _handleAppStateChange = async (nextAppState) => {
+    //CHECKING IF USER IS ON OR NOT AND UPDATING IT ON DATABASE!
     if (nextAppState === 'inactive') {
       console.log('the app is closed');
     }

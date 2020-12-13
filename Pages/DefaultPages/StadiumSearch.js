@@ -57,11 +57,11 @@ export default class StadiumSearch extends Component {
       haslocation: true,
       error: "בחר במיקום או השתמש במיקום שלך.",
       reloading: false,
-      showError:false
+      showError: false
     };
   }
   getlocation = async () => {
-    this.setState({ reloading: true, search: "NO" });
+    this.setState({ reloading: true, search: "NO",haslocation:true });
     let { status } = await Location.requestPermissionsAsync();
 
     if (status !== "granted") {
@@ -69,22 +69,28 @@ export default class StadiumSearch extends Component {
         errorMessage: "Permission to access location was denied",
       });
     }
-    let location = await Location.getCurrentPositionAsync({});
+    try {
+      let location = await Location.getCurrentPositionAsync({});
 
-    if (location) {
-      let reverseGC = await Location.reverseGeocodeAsync(location.coords);
-      console.log(reverseGC);
-      if (
-        reverseGC[0].city == null ||
-        reverseGC[0].city == undefined ||
-        reverseGC[0].city.length == 0
-      ) {
-        //TODO SHOW ERROR
-      } else {
-        this.setState({ search: reverseGC[0].city }, () => this.getstadiums());
+      if (location) {
+        let reverseGC = await Location.reverseGeocodeAsync(location.coords);
+        console.log(reverseGC);
+        if (
+          reverseGC[0].city == null ||
+          reverseGC[0].city == undefined ||
+          reverseGC[0].city.length == 0
+        ) {
+          //TODO SHOW ERROR
+        } else {
+          this.setState({ search: reverseGC[0].city }, () => this.getstadiums());
+        }
+      }
+      else {
+        this.setState({ haslocation: false });
       }
     }
-    else {
+    catch (ex) {
+      this.setState({ haslocation: false });
     }
   };
 
@@ -93,14 +99,22 @@ export default class StadiumSearch extends Component {
     //CHECKING IF USER HAS LOCATION ENABLED OR NO
     var Answer = await Location.hasServicesEnabledAsync();
 
-    if (Answer == false) {
-      var { status } = await Location.requestPermissionsAsync();
 
-      if (status != "granted") {
-        this.setState({ haslocation: false });
+    if (Answer == false) {
+      try {
+        var location = await Location.getCurrentPositionAsync();
+        console.log("LOCATION IS : " + location);
+        if (status != "granted") {
+          this.setState({ haslocation: false });
+        }
+        else {
+          this.setState({ haslocation: true });
+        }
       }
-    } else {
-      this.setState({ haslocation: true });
+      catch (e) {
+        this.setState({ haslocation: false, error: "אפשר שירותי מיקום כדי להשתמש בדף." })
+      }
+
     }
 
     //CHECKING IF LOCATIONS OF STADIUMS ARE ALREADY IN LOCAL STORAGE
@@ -137,7 +151,7 @@ export default class StadiumSearch extends Component {
     this.setState({ reloading: true });
     if (this.state.search == "NO") {
       //TODO SHOW ERROR MESSAGE
-      this.setState({ error:"בחר במיקום או השתמש במיקום שלך.", reloading: false,showError:true });
+      this.setState({ error: "בחר במיקום או השתמש במיקום שלך.", reloading: false, showError: true });
       return;
     }
     let { status } = await Location.requestPermissionsAsync();
@@ -162,7 +176,7 @@ export default class StadiumSearch extends Component {
             error: "לא נמצאו אצטדיונים במיקום זה",
             stadiums: [],
             reloading: false,
-            showError:true
+            showError: true
           });
         } else {
           for (var i = 0; i < data.length; i++) {
@@ -186,7 +200,7 @@ export default class StadiumSearch extends Component {
   };
 
 
-  testloc = async () => { };
+
   render() {
     if (this.state.haslocation == true) {
       return (
@@ -361,7 +375,33 @@ export default class StadiumSearch extends Component {
         </Container>
       );
     } else {
-      return <Text> Enable location to use this page.</Text>;
+
+      return (
+        <Container>
+          <Header style={{ backgroundColor: "white" }} searchBar rounded>
+            <Item>
+              <Icon
+                name="menu"
+                style={{ color: HEADERBUTTONCOLOR, fontSize: 30 }}
+                onPress={() => this.props.navigation.toggleDrawer()}
+              />
+            </Item>
+          </Header>
+          <View style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+
+          }}>
+            <Text style={{ fontSize: 25, fontWeight: 'bold', textAlign: 'center' }}>
+              אפשר שירותי מיקום לשימוש בדף.
+    </Text>
+            <View>
+              <Button onPress={this.getlocation} info style={{ borderWidth: 1, width: '100%',marginTop:10 }}><Text2 style={{fontWeight:'bold'}}>אפשר שירותי מיקום</Text2></Button>
+            </View>
+          </View>
+        </Container>
+      )
     }
   }
 }
