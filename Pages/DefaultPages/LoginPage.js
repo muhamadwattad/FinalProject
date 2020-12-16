@@ -30,6 +30,7 @@ export default class LoginPage extends Component {
       return;
     }
 
+    console.log(APILINK + "Login/" + name + "/" + password);
     await fetch(APILINK + "Login/" + name + "/" + password).then((resp) => {
       return resp.json();
     }).then(async (data) => {

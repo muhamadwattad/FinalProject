@@ -202,9 +202,7 @@ export default class SortByLocationTab extends Component {
                 />
               </Button>
             </Right>
-            <Body>
-              <Text>{this.state.errormsg}</Text>
-            </Body>
+         
           </Header>
           {
             this.state.loading == true ? <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'smoke',  height: '100%' }} >
