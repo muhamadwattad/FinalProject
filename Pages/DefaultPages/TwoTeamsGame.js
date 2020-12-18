@@ -40,7 +40,7 @@ export default class TwoTeamsGame extends Component {
       selectedvalue2: "בחר קבוצה",
       games: [],
       openmodal: false,
-      error: ".בחר בשתי קבוצות שונות לראות מתי הן משחקות זו נגד זו",
+      error: "בחר שתי קבוצות שונות כדי לראות את המשחקים ביניהן.",
       showError:false
     };
   }

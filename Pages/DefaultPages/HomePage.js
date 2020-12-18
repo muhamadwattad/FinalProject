@@ -239,7 +239,7 @@ export default class HomePage extends Component {
 
         <Content scrollEnabled={true}>
           {/* GAME INFO MODAL */}
-          <Modal visible={this.state.openmodal}>
+          <Modal visible={this.state.openmodal} animationType="slide">
             <Header style={{ backgroundColor: "white" }}>
               <Right style={{ flex: 1 }}>
                 <Button
@@ -273,7 +273,7 @@ export default class HomePage extends Component {
             showProgress={false}
             title="אין משחקים"
             message="לא נמצאו משחקים בתאריך זה"
-            closeOnTouchOutside={true}
+            closeOnTouchOutside={false}
             closeOnHardwareBackPress={false}
             showCancelButton={false}
             showConfirmButton={true}

@@ -40,7 +40,8 @@ export default class GameInfo extends Component {
         away: this.props.awayTeam,
       },
       () => {
-        console.log(this.state.game)
+        console.log("GAME:\n");
+        console.log(this.state.game);
         //CHECKING IF GAME HAS STARTED ALREADY OR NOT
         var gameStatus = "";
         var color = ""
@@ -80,6 +81,7 @@ export default class GameInfo extends Component {
     this.setState({ matchdate: matchdate2 + " " + matchdate });
 
     var stadiums = await JSON.parse(await AsyncStorage.getItem("stadiums"));
+
     if (stadiums == null || stadiums == undefined) {
       //GETTING GAMES
       await fetch("http://wattad.up2app.co.il/getstadiums").then((resp) => {
@@ -94,11 +96,12 @@ export default class GameInfo extends Component {
       })
     }
     else {
-      this.setState({ stadiums }, () => {
+      this.setState({ stadiums },async () => {
         //getting the stadium of this game
         let stadiumname = this.state.game.venue;
-        let obj = this.state.stadiums.find(x => x.venue_name == stadiumname);
-        console.log(obj)
+        console.log(stadiumname);
+        let obj = await this.state.stadiums.find(x => x.venue_name.includes(stadiumname));
+        console.log(obj);
         if (obj != null)
           this.setState({ stadium: obj},()=>{
             //getting the image of the stadium
