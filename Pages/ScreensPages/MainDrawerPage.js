@@ -1,3 +1,5 @@
+import * as ImagePicker from 'expo-image-picker';
+
 import { AsyncStorage, Modal, View } from "react-native";
 import {
   Body,
@@ -35,9 +37,12 @@ import MoreStadium from "./MoreStadium";
 import { NavigationContainer } from "@react-navigation/native";
 import SettingsForm from './SettingsPageScreen'
 import StadiumSearch from "../DefaultPages/StadiumSearch";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import TwoTeamsGame from "../DefaultPages/TwoTeamsGame";
 
 const Drawer = createDrawerNavigator();
+
+//Drawer Class
 export default class MainDrawerPage extends Component {
   render() {
     return (
@@ -192,6 +197,15 @@ export class Sidebar extends Component {
     // }
   };
 
+  PickImage=async()=>{
+    let result = await ImagePicker.launchImageLibraryAsync({
+      //allowsEditing: true,
+      //aspect: [4, 3],
+      });
+      if (!result.cancelled) {
+      console.log( result.uri );
+      }
+  }
   render() {
     return (
       <Container
@@ -258,10 +272,12 @@ export class Sidebar extends Component {
                 color: this.state.color,
               }}
             >
-              <Thumbnail
-                source={{ uri: this.state.image }}
-                style={{}}
-              ></Thumbnail>
+              <TouchableOpacity onPress={this.PickImage}>
+                <Thumbnail
+                  source={{ uri: this.state.image }}
+                  style={{}}
+                ></Thumbnail>
+              </TouchableOpacity>
             </Left>
             <Body style={{ marginRight: 15, justifyContent: 'center' }}>
               <H3 style={{ color: this.state.color }}>{this.state.username}</H3>

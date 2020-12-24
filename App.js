@@ -47,12 +47,14 @@ export default class App extends React.Component {
       if ('Message' in data) {
 
       } else {
+        var stadiums=data;
+        console.log(stadiums);
         await AsyncStorage.setItem("stadiums", JSON.stringify(data));
       }
     })
 
     //SAVING TEAMS IN ASYNC STORAGE
-    await fetch("http://wattad.up2app.co.il/getteams").then((resp) => {
+    await fetch("http://wattad.up2app.co.il/getteams").then((resp) => {``
       return resp.json();
     }).then(async(data) => {
       if ('Message' in data) {

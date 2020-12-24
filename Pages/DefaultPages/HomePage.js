@@ -498,6 +498,7 @@ export default class HomePage extends Component {
   }
 
   async UNSAFE_componentWillMount() {
+    //TODO HELELEL
     await this.getDates();
   }
 
@@ -507,6 +508,10 @@ export default class HomePage extends Component {
 
     var NewDate = TurnDate(date);
     var url = APILINK + "getgamesbydate/" + NewDate;
+    let body={
+      
+    }
+    console.log(url);
 
     await fetch(url).then((resp) => {
       return resp.json();

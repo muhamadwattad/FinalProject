@@ -5,12 +5,16 @@ import { Alert, AsyncStorage, Dimensions, FlatList, I18nManager, Image, Keyboard
 import { Container, Header, Icon } from "native-base";
 import React, { Component } from 'react';
 
+import AwesomeAlert from 'react-native-awesome-alerts';
+
 export default class LoginPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       username: "",
       password: "",
+      errorMsg: '',
+      showError: false
     };
   }
   Login = async () => {
@@ -63,7 +67,7 @@ export default class LoginPage extends Component {
           let result = await LocalAuthentication.authenticateAsync(
 
           );
-          
+
           if (result.success == true) {
             this.props.navigation.navigate("DefaultPages");
           }
@@ -86,7 +90,27 @@ export default class LoginPage extends Component {
   render() {
     return (
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+
         <View style={styles.container}>
+          <AwesomeAlert
+            show={this.state.showError}
+            showProgress={false}
+            title="שגיאה"
+            message={this.state.errorMsg}
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            cancelText="No, cancel"
+            confirmText="לְהַמשִׁיך"
+            confirmButtonColor="#DD6B55"
+            onCancelPressed={() => {
+              this.setState({ showError: false })
+            }}
+            onConfirmPressed={() => {
+              this.setState({ showError: false })
+            }}
+          />
           <View style={styles.bigCircle}></View>
           <View style={styles.smallCircle}></View>
           <View style={styles.centerizedView}>
@@ -149,82 +173,7 @@ export default class LoginPage extends Component {
         </View>
       </TouchableWithoutFeedback>
     );
-    // return (
-    //     <View style={{width:'100%'}}>
-    //       <View style={{ marginTop: 0, alignItems: "center", justifyContent: "center" }}>
-    //         <Image source={require("../../assets/logo.jpg")} style={{ height: 220 }} />
-    //       </View>
-    //       <View style={{ marginTop: 10, flexDirection: "row", justifyContent: "center" }}>
-    //         <TouchableOpacity onPress={this.FaceBookLogin}>
-    //           <View style={styles.socialButton}>
-    //             <Image source={require("../../assets/logo.jpg")} style={styles.socialLogo} />
-    //             <Text style={styles.text}>Facebook</Text>
-    //           </View>
-    //         </TouchableOpacity>
 
-
-    //       </View>
-
-    //       <Text style={[styles.text, { color: "#ABB4BD", fontSize: 15, textAlign: "center", marginVertical: 20 }]}>או</Text>
-
-    //       <Text style={[styles2.inputTitle]}> שם משתמש</Text>
-    //       <TextInput
-    //         value={this.state.username}
-    //         placeholder=""
-    //         onChangeText={(username) => {
-    //           this.setState({ username })
-    //         }}
-    //         style={[styles2.input],{borderWidth:1,textAlign:'center'}}
-    //       />
-    //       <View style={{ borderBottomColor: "#D8D8D8", borderBottomWidth: 1 }} />
-    //       <Text style={styles2.inputTitle}> סיסמה</Text>
-    //       <TextInput
-    //         value={this.state.password}
-    //         placeholder=''
-    //         onChangeText={(password) => {
-    //           this.setState({ password })
-    //         }}
-    //         style={styles2.input}
-    //       />
-    //       <View style={{ borderBottomColor: "#D8D8D8", borderBottomWidth: 1 }} />
-
-
-
-    //       <Text style={[styles.text, styles.link, { textAlign: "right" }]} onPress={this.ForgotPassword}>שכחת את הסיסמה שלך ?</Text>
-
-    //       <TouchableOpacity style={styles.submitContainer}
-    //         onPress={this.Login}
-    //       >
-    //         <Text
-    //           style={[
-    //             styles.text,
-    //             {
-    //               color: "#FFF",
-    //               fontWeight: "600",
-    //               fontSize: 16
-    //             }
-    //           ]}
-    //         >
-    //           התחברות
-    //         </Text>
-    //       </TouchableOpacity>
-
-    //       <Text
-    //         style={[
-    //           styles.text,
-    //           {
-    //             fontSize: 14,
-    //             color: "#ABB4BD",
-    //             textAlign: "center",
-    //             marginTop: 24
-    //           }
-    //         ]}
-    //       >
-    //         אין לך חשבון ? <Text style={[styles.text, styles.link]} onPress={this.SignUp}>הירשם </Text>
-    //       </Text>
-    //     </View>
-
-    // );
   }
 }
 //HEADERBUTTONCOLOR
