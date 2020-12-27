@@ -70,15 +70,18 @@ export default class SortByLocationTab extends Component {
 
 
   getUserLocation = async () => {
+    //showing loading Logo
     this.setState({ loading: true })
+    //checking if user has location enabled
     let { status } = await Location.requestPermissionsAsync();
-    console.log(status);
-    if (status != "granted") {
+    
+    if (status != "granted") { // if user has location not granted Error screen will be shown
       this.setState({ loading: false, dontload: true, errormsg: "NEED LOCATION PERMISSION" });
       return;
     }
     else {
       try {
+        //getting user's coords
         let location = await Location.getCurrentPositionAsync({});
 
         if (location != null) {
@@ -86,26 +89,27 @@ export default class SortByLocationTab extends Component {
           let longitude = location.coords.longitude;
           let latitude = location.coords.latitude;
           this.setState({ longitude, latitude });
+          //reversing location coords to object with city, country etc...
           let reverseGC = await Location.reverseGeocodeAsync(location.coords);
 
-          if (
+          if ( //checking if failed to get city
             reverseGC[0].city == null ||
             reverseGC[0].city == undefined ||
             reverseGC[0].city.length == 0
-          ) {
+          ) { //showing error
             this.setState({ loading: false, errormsg: "FAILED TO GET CITY", dontload: true });
             return;
           } else {
-            console.log("TEST TEST");
+           
             this.setState({ city: reverseGC[0].city }, () => this.getStadiums());
           }
         }
-        else {
+        else { // failed to get location, showing error screen.
           this.setState({ loading: false, errormsg: "FAILED TO GET LOCATION", dontload: true });
           return;
         }
       }
-      catch (e) {
+      catch (e) { //failed to get location, showing error screen.
         this.setState({ loading: false, dontload: true, errormsg: "NEED LOCATION PERMISSION" });
         return;
       }

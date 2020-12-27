@@ -14,7 +14,9 @@ export default class LoginPage extends Component {
       username: "",
       password: "",
       errorMsg: '',
-      showError: false
+      showError: false,
+      EmailInput:false,
+      PasswordInput:false
     };
   }
   Login = async () => {
@@ -25,12 +27,12 @@ export default class LoginPage extends Component {
 
     //IF NAME OR PASSWORD ARE EMPTY SHOW ERROR MESSAGE
     if (name.length == 0 || password.length == 0) {
-      //TODO Add ALERT TO SHOW ERROR
+      this.setState({errorMsg:"אנא הזן שם משתמש וסיסמה.",showError:true});
       return;
     }
     //IF NAME OR PASSWORD ARE EMPTY SHOW ERROR MESSAGE
     if (name == ' ' || password == ' ') {
-      //TODO Add ALERT TO SHOW ERROR
+      this.setState({errorMsg:"אנא הזן שם משתמש וסיסמה.",showError:true});
       return;
     }
 
@@ -43,6 +45,7 @@ export default class LoginPage extends Component {
       if ('Message' in data) {
         //TODO Add ALERT TO SHOW ERROR
         console.log("user doesnt exists");
+        this.setState({errorMsg:"פרטי החשבון אינם נכונים.",showError:true});
       }
       else {
         await AsyncStorage.setItem("activeuser", JSON.stringify(data));
@@ -53,31 +56,52 @@ export default class LoginPage extends Component {
 
   }
   async componentDidMount() {
+    //getting if user has been signed in already
     var user = await AsyncStorage.getItem("activeuser");
+    //getting if user has autologin enabled/ disabled
     var autologin = await AsyncStorage.getItem("autologin");
+    //getting if user has login with fingerprints enabled or disabled
     var loginfinger = await AsyncStorage.getItem("loginfinger");
-    console.log("LOGIN FINGER : " + loginfinger);
-    console.log("AUTO LOGIN " + autologin);
-    console.log("USER: " + user);
-    if (user != null) {
+  
+    if (user != null) { // checking if user is null or not
+      //checking if user's info are correct!a
+      var currentuser=JSON.parse(user);
+      console.log(currentuser);
+      console.log('came here')
+      let url=APILINK + "Login/" + currentuser.name + "/" + currentuser.password;
+      console.log(url);
+      await fetch(url).then((resp) => {
+        return resp.json();
+      }).then(async (data) => {
+        console.log(data);
+        //IF API RETURNS MESSAGE IT MEANS THAT INFORMATION ARE WRONG
+        if ('Message' in data) {
+          //TODO Add ALERT TO SHOW ERROR
+         alert("WRONG INFO");
+         await AsyncStorage.removeItem("activeuser");
+         return;
+        }
+        else {
+          await AsyncStorage.setItem("activeuser", JSON.stringify(data));
+        }
+      })
       //CHECKING IF USER HAS AUTOLOGIN ON!!!
-      if (autologin == "True" || autologin == null)
+     
+      if (autologin == "True" || autologin == null) // if user had autologin enabled ( by defualt (null) its enabled)
         if (loginfinger == "True") {
           //LOGINING IN WITH FINGER PRINTS
-          let result = await LocalAuthentication.authenticateAsync(
+          let result = await LocalAuthentication.authenticateAsync(); //getting user's fingerprint 
 
-          );
-
-          if (result.success == true) {
-            this.props.navigation.navigate("DefaultPages");
+          if (result.success == true) { //result is success ( user has used fingerprint currectly)
+            this.props.navigation.navigate("DefaultPages"); //sending him to home page
           }
-          else {
-            this.setState({ username: JSON.parse(user).name });
+          else { // if user has failed the fingerprint app will ask him to put his password.
+            this.setState({ username: JSON.parse(user).name }); 
           }
         }
-        else
+        else // going to home page without asking him for finger prints
           this.props.navigation.navigate("DefaultPages");
-      else {
+      else { //asking user for his password because autologin is off.
         this.setState({ username: JSON.parse(user).name });
       }
     }
@@ -87,6 +111,7 @@ export default class LoginPage extends Component {
     this.props.navigation.navigate("Signup");
   };
 
+  
   render() {
     return (
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>

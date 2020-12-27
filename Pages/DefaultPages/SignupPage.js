@@ -7,9 +7,10 @@ import React, { Component } from 'react';
 
 import AwesomeAlert from 'react-native-awesome-alerts'
 import { Notifications } from 'expo';
+import registerForPushNotificationsAsync from './registerForPushNotificationsAsync';
 
 // import * as LocalAuthentication from 'expo-local-authentication';
-
+const delay = ms => new Promise(res => setTimeout(res, ms));
 let x;
 export default class SignupPage extends Component {
   constructor(props) {
@@ -22,7 +23,10 @@ export default class SignupPage extends Component {
       showView: true,
       inputOpen: '',
       errorMsg: '',
-      showError: false
+      showError: false,
+      showProgress: false,
+      showConfirm: false,
+      confirmMsg: ''
     }
   }
   PickImage = async () => {
@@ -53,10 +57,13 @@ export default class SignupPage extends Component {
     }
   }
   Signup = async () => {
+
+
     //Checking if user added Username+password+image
-    if (!(this.state.username.length >= 8 && this.state.username <= 12)) {
+    if (!(this.state.username.length >= 6 && this.state.username.length <= 14)) {
       //Username must be between 8-12
-      this.setState({ errorMsg: 'אורך שם המשתמש חייב להיות בין 8 ל 12 אותיות.', showError: true })
+      console.log(this.state.username);
+      this.setState({ errorMsg: 'אורך שם המשתמש חייב להיות בין 6 ל 14 אותיות.', showError: true })
       return;
     }
     if (!(this.state.password.length >= 6 && this.state.password.length <= 14)) {
@@ -70,27 +77,79 @@ export default class SignupPage extends Component {
       this.setState({ errorMsg: 'עליך להוסיף תמונת פרופיל.', showError: true });
       return;
     }
+    //Checking if email is good
+    var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if (!filter.test(this.state.email)) {
+      this.setState({ errorMsg: 'כתובת הדוא"ל חייבת להיות כמו: me@example.com', showError: true });
+      return;
+    }
     //Username , password and Profile are all good
 
-    //Uploading Image First to File
+    //checking if username and email exists in the database
+    let ReturnedValue;
+    let url = APILINK + "checkifuserexists/" + this.state.email + "/" + this.state.username + "/";
+    console.log(url);
+    await fetch(url).then((resp) => {
+      return resp.json();
+    }).then(async (data) => {
+      ReturnedValue = data;
+    });
 
 
-    // var obj = {
-    //   User_Name: this.state.username,
-    //   User_Email: this.state.email,
-    //   User_Password: this.state.password,
-    //   User_Location: "undefined",
-    //   User_Token: "undefined",
-    //   User_Image: ""
-    // };
-    // var config = {
-    //   method: 'POST',
-    //   body: JSON.stringify(obj),
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "Accept": "application/json"
-    //   }
-    // };
+    if (ReturnedValue == 'Ok') //username + email do not exist in database.
+    {
+
+      //getting Expo token for push notifications
+      let token = await Notifications.getExpoPushTokenAsync();
+      //Adding User to Database
+      var obj = { //saving user's info into an object
+        name: this.state.username,
+        email: this.state.email,
+        password: this.state.password,
+        location: "",
+        active: "",
+        image: "nothing"
+      };
+      var config = { //headers for the request
+        method: 'PUT',
+        body:
+          JSON.stringify(obj),
+
+
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        }
+      };
+      let Url = APILINK + "Signup/" + token + "/";
+      console.log(Url);
+      await fetch(Url, config).then((resp) => {
+        return resp.json();
+      }).then(async (data) => {
+        //Something went wrong...
+        if (data == 0) {
+          this.setState({ errorMsg: 'משהו השתבש. בבקשה נסה שוב מאוחר יותר.', showProgress: false, showError: true })
+          return;
+        }
+        //Uploading photo of user.
+        //setting photo name as Username's and time he uploaded it.
+        let date = new Date()
+        let imgName = this.state.username + "" + date.getDay() + "" + date.getMonth() + "" + date.getFullYear() + "" + date.getHours() + "" + date.getMinutes() + "" + date.getSeconds() + ".jpg";
+        //sending photo uri and username
+        this.imageUploadToApi(this.state.image, imgName, this.state.username);
+      })
+    }
+    else if (ReturnedValue == 'Name Exists') { // Username exist in database
+      this.setState({ errorMsg: 'שם המשתמש הזה כבר רשום.', showError: true },)
+      return;
+
+    }
+    else { // email exists in database
+      this.setState({ errorMsg: 'כתובת דוא"ל זו כבר רשומה.', showError: true })
+      return;
+    }
+
+
 
 
   }
@@ -100,7 +159,7 @@ export default class SignupPage extends Component {
 
   }
   imageUploadToApi = async (imgUri, picName) => {
-
+    this.setState({ showProgress: true });
     let dataI = new FormData();
     dataI.append('picture', {
       uri: imgUri,
@@ -117,26 +176,60 @@ export default class SignupPage extends Component {
         if (res.status == 201) { return res.json(); }
         else { return "err"; }
       })
-      .then((responseData) => {
+      .then(async (responseData) => {
         if (responseData != "err") {
+          //getting image uri that has been uploaded.
           let picNameWOExt = picName.substring(0, picName.indexOf("."));
+
           let imageNameWithGUID = responseData.substring(responseData.indexOf(picNameWOExt),
             responseData.indexOf(".jpg") + 4);
           this.setState({
             imageNameWithGuid: imageNameWithGUID
-          }, () => console.log(this.state.imageNameWithGuid));
+          }, async () => {
+            console.log(this.state.imageNameWithGuid);
+            //adding picture url to database
+
+
+            await fetch(APILINK + "UpdateImage/" + this.state.email + "/" + this.state.imageNameWithGuid + "/").then((resp) => {
+              return resp.json();
+            }).then((data) => {
+              if (data == 0) {
+                //photo uri was not uploaded.
+                this.setState({ showProgress: false });
+                this.setState({ confirmMsg: 'המשתמש נרשם בהצלחה,למרות זאת התמונה לא הועלתה' }, () => {
+                  delay(2000);
+                  this.setState({ showConfirm: true });
+                });
+              }
+              else {
+                //everyting is successfull
+                this.setState({ showProgress: false });
+                this.setState({ showProgress: false, confirmMsg: 'המשתמש נרשם בהצלחה.' }, () => {
+                  delay(2000);
+                  this.setState({ showConfirm: true });
+                })
+              }
+            })
+          }
+
+          );
         }
         else {
-          //TODO show error
-          alert('error uploding ...');
+          //image was not uploaded.
+          this.setState({ showProgress: false });
+          this.setState({ confirmMsg: 'המשתמש נרשם בהצלחה,למרות זאת התמונה לא הועלתה', showProgress: false }, () => {
+            delay(2000);
+            this.setState({ showConfirm: true });
+          });
         }
       })
       .catch(err => {
-        //TODO show error  
-
-        alert('err upload= ' + err);
-
-
+        //image was not uploaded.
+        this.setState({ showProgress: false });
+        this.setState({ confirmMsg: 'המשתמש נרשם בהצלחה,למרות זאת התמונה לא הועלתה', showProgress: false }, () => {
+          delay(2000);
+          this.setState({ showConfirm: true });
+        });
       });
 
   }
@@ -154,6 +247,48 @@ export default class SignupPage extends Component {
             closeOnHardwareBackPress={false}
             showCancelButton={false}
             showConfirmButton={true}
+            cancelText="No, cancel"
+            confirmText="לְהַמשִׁיך"
+            confirmButtonColor="#DD6B55"
+            onCancelPressed={() => {
+              this.setState({ showError: false })
+            }}
+            onConfirmPressed={() => {
+              this.setState({ showError: false })
+            }}
+          />
+
+          <AwesomeAlert
+            show={this.state.showConfirm}
+            showProgress={false}
+            title="מוּצלָח!"
+            message={this.state.confirmMsg}
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            cancelText="No, cancel"
+            confirmText="לְהַמשִׁיך"
+            confirmButtonColor="#5cb85c"
+            onCancelPressed={() => {
+              this.setState({ showConfirm: false })
+            }}
+            onConfirmPressed={() => {
+              this.setState({ showConfirm: false },()=>{
+                this.props.navigation.navigate("Login");
+              })
+            }}
+          />
+
+          <AwesomeAlert
+            show={this.state.showProgress}
+            showProgress={true}
+            title=""
+
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={false}
             cancelText="No, cancel"
             confirmText="לְהַמשִׁיך"
             confirmButtonColor="#DD6B55"
@@ -229,7 +364,7 @@ export default class SignupPage extends Component {
 
               <TouchableOpacity style={styles.loginButton} onPress={this.PickImage}>
                 <View style={{ flexDirection: 'row' }}>
-                  <Icon name="home" style={{ width: '20%', fontSize: 30, color: '#fff', fontWeight: 'bold', }} />
+                  <Icon name="image" style={{ width: '20%', fontSize: 30, color: '#fff', fontWeight: 'bold', }} />
                   <Text style={{
 
                     width: '60%',
@@ -241,7 +376,17 @@ export default class SignupPage extends Component {
                 </View>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.loginButton]} onPress={this.Signup}>
-                <Text style={styles.loginButtonText}>הרשמה</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <Icon name="user-plus" type="FontAwesome5" style={{ width: '20%', fontSize: 30, color: '#fff', fontWeight: 'bold', }} />
+                  <Text style={{
+
+                    width: '60%',
+                    color: '#fff',
+                    textAlign: 'center',
+                    fontSize: 20,
+                    fontWeight: 'bold',
+                  }}>הרשמה</Text>
+                </View>
               </TouchableOpacity>
 
             </View>

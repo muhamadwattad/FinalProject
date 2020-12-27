@@ -47,16 +47,17 @@ export default class App extends React.Component {
       if ('Message' in data) {
 
       } else {
-        var stadiums=data;
-        console.log(stadiums);
+        var stadiums = data;
+        
         await AsyncStorage.setItem("stadiums", JSON.stringify(data));
       }
     })
 
     //SAVING TEAMS IN ASYNC STORAGE
-    await fetch("http://wattad.up2app.co.il/getteams").then((resp) => {``
+    await fetch("http://wattad.up2app.co.il/getteams").then((resp) => {
+      ``
       return resp.json();
-    }).then(async(data) => {
+    }).then(async (data) => {
       if ('Message' in data) {
 
       }
@@ -74,7 +75,7 @@ export default class App extends React.Component {
     while (teams == null) {
 
       var url = APILINK + "getteams/"
-      console.log(url);
+      
       await fetch(url).then((resp) => {
         return resp.json();
       }).then(async (data) => {
@@ -86,30 +87,32 @@ export default class App extends React.Component {
   }
   _handleAppStateChange = async (nextAppState) => {
     //CHECKING IF USER IS ON OR NOT AND UPDATING IT ON DATABASE!
-    if (nextAppState === 'inactive') {
-      console.log('the app is closed');
-    }
-    if (nextAppState == 'background') {
 
+    if (nextAppState == 'background') { // user went to background
+
+      //getting user to update his online status
       var user = await AsyncStorage.getItem("activeuser");
+
       if (user != null) {
+        //parsing the user to object
         var currentuser = JSON.parse(user);
-        var url = APILINK + "updateStatus/" + currentuser.email + "/false/"
+        var url = APILINK + "updateStatus/" + currentuser.email + "/false/" //updating his online status to offline
 
         await fetch(url);
       }
     }
-    if (nextAppState == 'active') {
-
+    if (nextAppState == 'active') { // user is active on the app
+      //getting user to update his online status
       var user = await AsyncStorage.getItem("activeuser");
       if (user != null) {
+        //parsing the user to object
         var currentuser = JSON.parse(user);
-        var url = APILINK + "updateStatus/" + currentuser.email + "/true/"
+        var url = APILINK + "updateStatus/" + currentuser.email + "/true/" //updating his online status to online
         await fetch(url);
       }
     }
     this.setState({ appState: nextAppState }, () => {
-      console.log(this.state.appState);
+      
     });
 
   }

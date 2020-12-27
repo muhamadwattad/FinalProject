@@ -52,8 +52,8 @@ export default class HomePage extends Component {
 
   }
 
-  HideTeamListModal=()=>{
-    this.setState({teamlistmodal:false});
+  HideTeamListModal = () => {
+    this.setState({ teamlistmodal: false });
   }
   render() {
 
@@ -498,7 +498,7 @@ export default class HomePage extends Component {
   }
 
   async UNSAFE_componentWillMount() {
-    //TODO HELELEL
+
     await this.getDates();
   }
 
@@ -507,28 +507,27 @@ export default class HomePage extends Component {
     //TURNING DATE TO C# DATE TO GET DATA FROM API
 
     var NewDate = TurnDate(date);
-    var url = APILINK + "getgamesbydate/" + NewDate;
-    let body={
-      
-    }
-    console.log(url);
 
+    var url = APILINK + "getgamesbydate/" + NewDate;
+
+
+    //getting games from api
     await fetch(url).then((resp) => {
       return resp.json();
     }).then(async (data) => {
       //CHECKING IF GAMES HAS BEEN ADDED SUCCESFULLY
-      if ('Message' in data) {
+      if ('Message' in data) {ll
         this.setState({ games: "No Games Found" }, () => {
-          if (this.state.showCalendar == true)
-            this.setState({ showCalendar: false })
-          this.setState({ showError: true });
+          if (this.state.showCalendar == true) // hiding the calendar off
+            this.setState({ showCalendar: false });
+          this.setState({ showError: true }); // showing error the theres no games found on that date.
 
         });
       }
       else {
-        //SAVING GAMES INTO ARRAY IN THE STATE AND IN ASYNC STORAGE 
+        //SAVING GAMES INTO ARRAY IN THE STATE 
         this.setState({ games: data }, () => {
-          this.setState({ showCalendar: false });
+          this.setState({ showCalendar: false }); //hiding calendar
         });
 
       }

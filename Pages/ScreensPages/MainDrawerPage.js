@@ -24,12 +24,12 @@ import {
   DrawerItemList,
   createDrawerNavigator,
 } from "@react-navigation/drawer";
+import { HEADERBUTTONCOLOR, URLOFFILE } from "../URL";
 import React, { Component } from "react";
 
 import Animated from "react-native-reanimated";
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { DrawerActions } from "@react-navigation/native";
-import { HEADERBUTTONCOLOR } from "../URL";
 import HelpPage from "../DefaultPages/HelpPage";
 import HomePage from "../DefaultPages/HomePage";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -188,23 +188,28 @@ export class Sidebar extends Component {
     //PUTS USERNAME AND EMAIL INSIDE OF DRAWER
     this.setState({ username: currentuser.name, email: currentuser.email });
 
-    //PUTS IMAGE URL
+    //getting user's image
+    if (currentuser.image.length < 3) {
 
-    //TODO FIX THIS
-    // var image = currentuser.image;
-    // if (!image.includes("https://platform-lookaside")) {
-    //   image = UrlOfFile + image;
-    // }
+      return;
+    }
+    var imageurl = currentuser.image.substr(currentuser.image.length - 3); //getting the last 3 letters from image
+    if (imageurl == 'jpg') {
+      //getting url of image
+      var image = URLOFFILE + currentuser.image;
+      console.log(image);
+      this.setState({ image });
+    }
   };
 
-  PickImage=async()=>{
+  PickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       //allowsEditing: true,
       //aspect: [4, 3],
-      });
-      if (!result.cancelled) {
-      console.log( result.uri );
-      }
+    });
+    if (!result.cancelled) {
+      console.log(result.uri);
+    }
   }
   render() {
     return (

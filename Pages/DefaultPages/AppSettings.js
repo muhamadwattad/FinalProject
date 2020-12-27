@@ -11,7 +11,7 @@ export default class AppSettings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      notfication: false,
+      notfication: true,
       autologin: true,
       loginfinger: false,
     };
@@ -40,6 +40,19 @@ export default class AppSettings extends Component {
     else {
       this.setState({ loginfinger: false });
     }
+    var user = await AsyncStorage.getItem("activeuser");
+    var currentuser = JSON.parse(user);
+    //Getting Notification Status
+    await fetch(APILINK+"getnotificationstatus/"+currentuser.email+"/").then((resp)=>{
+      return resp.json();
+    }).then((data)=>{
+      console.log(data);
+      if(data==false)
+      {
+        this.setState({notfication:false})
+      }
+    })
+    
   }
 
   setAutoLogin = async () => {
